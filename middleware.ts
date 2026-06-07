@@ -2,12 +2,18 @@ import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
 const PROTECTED_PREFIXES = ["/student", "/assessor", "/admin"];
+// Routes that should remain reachable without auth even though they live
+// near a protected prefix (e.g. /pricing is public despite /admin being
+// protected). Add path equality only — these are never prefix matches.
+const PUBLIC_PATHS = new Set<string>(["/pricing"]);
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Always refresh the session cookie so server components see fresh auth.
   const { response, user } = await updateSession(request);
+
+  if (PUBLIC_PATHS.has(pathname)) return response;
 
   // Public routes pass through unconditionally.
   const isProtected = PROTECTED_PREFIXES.some(
