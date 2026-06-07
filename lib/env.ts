@@ -17,4 +17,6 @@ export const serverEnv = {
   supabaseUrl: () => required("SUPABASE_URL"),
   supabaseServiceRoleKey: () => required("SUPABASE_SERVICE_ROLE_KEY"),
   recordingsBucket: () => optional("SUPABASE_RECORDINGS_BUCKET", "recordings"),
+  geminiApiKey: () => required("GEMINI_API_KEY"),
+  geminiModel: () => optional("GEMINI_MODEL", "gemini-2.5-pro"),
 };
