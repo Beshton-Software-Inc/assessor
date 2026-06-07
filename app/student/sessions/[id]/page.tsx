@@ -118,7 +118,15 @@ export default async function StudentSessionPage({ params }: PageProps) {
               </span>
             </p>
           </div>
-          <SignOutButton />
+          <div className="flex flex-col items-end gap-2">
+            <SignOutButton />
+            <Link
+              href={{ pathname: `/student/sessions/${sessionRow.id}/access` }}
+              className="inline-flex items-center rounded-md border border-indigo-700/60 bg-indigo-950/40 px-3 py-1.5 text-xs font-medium text-indigo-200 hover:border-indigo-500 hover:bg-indigo-900/40 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-neutral-950"
+            >
+              Manage access
+            </Link>
+          </div>
         </header>
 
         {!latest ? (

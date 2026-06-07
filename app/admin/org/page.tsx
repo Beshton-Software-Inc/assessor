@@ -1,3 +1,5 @@
+import Link from "next/link";
+import type { Route } from "next";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/server";
@@ -74,7 +76,17 @@ export default async function OrgAdminPage({
             <h1 className="text-2xl font-semibold text-neutral-900">
               Organization Admin
             </h1>
-            <SignOutButton />
+            <div className="flex items-center gap-3">
+              {user.profile?.is_app_admin && (
+                <Link
+                  href={"/admin/console" as Route}
+                  className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                >
+                  Console
+                </Link>
+              )}
+              <SignOutButton />
+            </div>
           </div>
           <div className="mt-8 rounded-2xl border border-neutral-200 bg-white p-6">
             <h2 className="text-base font-medium text-neutral-900">
@@ -125,7 +137,17 @@ export default async function OrgAdminPage({
             <h1 className="text-2xl font-semibold text-neutral-900">
               Organization Admin
             </h1>
-            <SignOutButton />
+            <div className="flex items-center gap-3">
+              {user.profile?.is_app_admin && (
+                <Link
+                  href={"/admin/console" as Route}
+                  className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                >
+                  Console
+                </Link>
+              )}
+              <SignOutButton />
+            </div>
           </div>
           <div className="mt-8 rounded-2xl border border-neutral-200 bg-white p-6">
             <p className="text-sm text-neutral-600">
@@ -271,6 +293,14 @@ export default async function OrgAdminPage({
           <div className="flex items-center gap-3">
             {pickerOrgs.length > 1 && (
               <OrgPicker orgs={pickerOrgs} current={selectedOrg.id} />
+            )}
+            {user.profile?.is_app_admin && (
+              <Link
+                href={"/admin/console" as Route}
+                className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+              >
+                Console
+              </Link>
             )}
             <SignOutButton />
           </div>
