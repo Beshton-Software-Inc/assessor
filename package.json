@@ -14,8 +14,12 @@
     "test:analyze": "tsx scripts/test-analyze.ts",
     "test:roles": "tsx scripts/test-roles.ts",
     "test:rls": "tsx scripts/test-rls.ts",
+    "test:rls-c": "tsx scripts/test-rls-c.ts",
     "test:share": "tsx scripts/test-share.ts",
-    "test:audit": "tsx scripts/test-audit.ts"
+    "test:audit": "tsx scripts/test-audit.ts",
+    "test:billing": "tsx scripts/test-billing.ts",
+    "test:invites": "tsx scripts/test-invites.ts",
+    "test:webhook": "tsx scripts/test-stripe-webhook.ts"
   },
   "dependencies": {
     "@google/genai": "^2.8.0",
