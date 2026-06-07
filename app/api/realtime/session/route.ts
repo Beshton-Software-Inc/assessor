@@ -1,16 +1,49 @@
 import { NextResponse } from "next/server";
 import { ALEX_SYSTEM_PROMPT } from "@/lib/ai/prompt";
 import { serverEnv } from "@/lib/env";
+import { getUser } from "@/lib/auth/getUser";
+import { supabaseServer } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+interface RealtimeBody {
+  sessionId?: string;
+}
 
 /**
  * Mints a short-lived OpenAI Realtime client_secret so the browser can open a
  * WebRTC peer connection directly to OpenAI without ever seeing the API key.
  * The system prompt is bound to the session at mint time.
+ *
+ * Authenticated callers only. If the body carries a `sessionId` we verify the
+ * caller can read that session row (RLS-gated) before minting — otherwise an
+ * attacker who knew about a session id could burn OpenAI tokens for it.
  */
-export async function POST() {
+export async function POST(req: Request) {
+  const user = await getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Body is optional — older clients call this with no payload. If present
+  // and a sessionId is supplied, do the RLS-gated read.
+  const body = (await req.json().catch(() => ({}))) as RealtimeBody;
+  if (body.sessionId) {
+    const supa = await supabaseServer();
+    const { data: row } = await supa
+      .from("sessions")
+      .select("id")
+      .eq("id", body.sessionId)
+      .maybeSingle();
+    if (!row) {
+      return NextResponse.json(
+        { error: "Forbidden: session not visible" },
+        { status: 403 },
+      );
+    }
+  }
+
   const apiKey = serverEnv.openaiApiKey();
   const model = serverEnv.openaiModel();
   const voice = serverEnv.openaiVoice();
