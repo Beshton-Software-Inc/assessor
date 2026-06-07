@@ -3,7 +3,7 @@ import type { Route } from "next";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/server";
-import { SignOutButton } from "./SignOutButton";
+import { UserMenu } from "@/components/UserMenu";
 import { OrgPicker, type OrgPickerOption } from "./OrgPicker";
 
 export const dynamic = "force-dynamic";
@@ -85,7 +85,10 @@ export default async function OrgAdminPage({
                   Console
                 </Link>
               )}
-              <SignOutButton />
+              <UserMenu
+                displayName={user.profile?.display_name}
+                email={user.email}
+              />
             </div>
           </div>
           <div className="mt-8 rounded-2xl border border-neutral-200 bg-white p-6">
@@ -177,7 +180,10 @@ export default async function OrgAdminPage({
                   Console
                 </Link>
               )}
-              <SignOutButton />
+              <UserMenu
+                displayName={user.profile?.display_name}
+                email={user.email}
+              />
             </div>
           </div>
           <div className="mt-8 rounded-2xl border border-neutral-200 bg-white p-6">
@@ -351,7 +357,10 @@ export default async function OrgAdminPage({
                 Console
               </Link>
             )}
-            <SignOutButton />
+            <UserMenu
+              displayName={user.profile?.display_name}
+              email={user.email}
+            />
           </div>
         </div>
 

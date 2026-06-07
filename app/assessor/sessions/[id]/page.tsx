@@ -6,7 +6,7 @@ import { supabaseServer, supabaseAdmin } from "@/lib/supabase/server";
 import { signRecordingUrl } from "@/lib/sessions/download";
 import type { AnalysisResult } from "@/lib/analysis/pdf";
 import { RunAnalysisButton } from "../../RunAnalysisButton";
-import { SignOutButton } from "../../SignOutButton";
+import { UserMenu } from "@/components/UserMenu";
 
 export const dynamic = "force-dynamic";
 
@@ -142,7 +142,10 @@ export default async function AssessorSessionPage({
               Duration: {formatDuration(session.duration_ms)}
             </p>
           </div>
-          <SignOutButton />
+          <UserMenu
+            displayName={user.profile?.display_name}
+            email={user.email}
+          />
         </div>
 
         <section className="mt-8 rounded-2xl border border-neutral-200 bg-white p-5">

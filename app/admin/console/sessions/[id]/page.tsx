@@ -6,7 +6,7 @@ import { supabaseAdmin, supabaseServer } from "@/lib/supabase/server";
 import { signRecordingUrl } from "@/lib/sessions/download";
 import type { AnalysisResult } from "@/lib/analysis/pdf";
 import { logAudit } from "@/lib/audit/log";
-import { SignOutButton } from "../../SignOutButton";
+import { UserMenu } from "@/components/UserMenu";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -216,7 +216,10 @@ export default async function AdminSessionDetailPage({
               )}
             </p>
           </div>
-          <SignOutButton />
+          <UserMenu
+            displayName={user.profile?.display_name}
+            email={user.email}
+          />
         </div>
 
         <section className="mt-6 grid gap-3 rounded-2xl border border-neutral-200 bg-white p-5 sm:grid-cols-3">

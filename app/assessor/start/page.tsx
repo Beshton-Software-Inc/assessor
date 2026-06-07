@@ -4,7 +4,7 @@ import { requireRole } from "@/lib/auth/requireRole";
 import { getAssessorOrgId } from "@/lib/auth/roles";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { listOrgEndusers, type OrgEnduser } from "@/lib/pairing/endusers";
-import { SignOutButton } from "../SignOutButton";
+import { UserMenu } from "@/components/UserMenu";
 import { EnduserPicker } from "./EnduserPicker";
 import { InviteNewStudent } from "./InviteNewStudent";
 
@@ -65,7 +65,10 @@ export default async function AssessorStartPage({ searchParams }: StartPageProps
             >
               Back
             </Link>
-            <SignOutButton />
+            <UserMenu
+              displayName={user.profile?.display_name}
+              email={user.email}
+            />
           </div>
         </div>
       </main>
@@ -105,7 +108,10 @@ export default async function AssessorStartPage({ searchParams }: StartPageProps
             >
               Back to assessor home
             </Link>
-            <SignOutButton />
+            <UserMenu
+              displayName={user.profile?.display_name}
+              email={user.email}
+            />
           </div>
         </div>
 

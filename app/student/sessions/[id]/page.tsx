@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth/requireRole";
 import { supabaseServer } from "@/lib/supabase/server";
 import { serverEnv } from "@/lib/env";
-import { SignOutButton } from "../../SignOutButton";
+import { UserMenu } from "@/components/UserMenu";
 
 export const dynamic = "force-dynamic";
 
@@ -119,7 +119,10 @@ export default async function StudentSessionPage({ params }: PageProps) {
             </p>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <SignOutButton />
+            <UserMenu
+              displayName={user.profile?.display_name}
+              email={user.email}
+            />
             <Link
               href={{ pathname: `/student/sessions/${sessionRow.id}/access` }}
               className="inline-flex items-center rounded-md border border-indigo-700/60 bg-indigo-950/40 px-3 py-1.5 text-xs font-medium text-indigo-200 hover:border-indigo-500 hover:bg-indigo-900/40 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-neutral-950"

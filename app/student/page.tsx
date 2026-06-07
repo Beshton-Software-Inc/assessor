@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { requireUser } from "@/lib/auth/requireRole";
 import { supabaseServer } from "@/lib/supabase/server";
-import { SignOutButton } from "./SignOutButton";
+import { UserMenu } from "@/components/UserMenu";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +42,10 @@ export default async function StudentPage() {
         <div className="mx-auto max-w-2xl px-6 py-16">
           <div className="flex items-start justify-between gap-4">
             <h1 className="text-2xl font-semibold">My Interviews</h1>
-            <SignOutButton />
+            <UserMenu
+              displayName={user.profile?.display_name}
+              email={user.email}
+            />
           </div>
           <div className="mt-10 rounded-lg border border-neutral-800 bg-neutral-900/60 p-6">
             <p className="text-sm text-neutral-300">
@@ -105,7 +108,10 @@ export default async function StudentPage() {
               </span>
             </p>
           </div>
-          <SignOutButton />
+          <UserMenu
+            displayName={user.profile?.display_name}
+            email={user.email}
+          />
         </header>
 
         {sessionsErr ? (

@@ -7,6 +7,7 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 export interface AuthedProfile {
   user_id: string;
   display_name: string | null;
+  phone_number: string | null;
   is_app_admin: boolean;
 }
 
@@ -42,7 +43,7 @@ export const getUser = cache(async (): Promise<AuthedUser | null> => {
   const [{ data: profile }, memberships] = await Promise.all([
     admin
       .from("profiles")
-      .select("user_id, display_name, is_app_admin")
+      .select("user_id, display_name, phone_number, is_app_admin")
       .eq("user_id", user.id)
       .maybeSingle(),
     getMemberships(user.id),

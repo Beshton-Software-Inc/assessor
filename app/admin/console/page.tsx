@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import type { Route } from "next";
 import { requireUser } from "@/lib/auth/requireRole";
 import { supabaseAdmin, supabaseServer } from "@/lib/supabase/server";
-import { SignOutButton } from "./SignOutButton";
+import { UserMenu } from "@/components/UserMenu";
 import { Tabs } from "./Tabs";
 import {
   AUDIT_ACTIONS,
@@ -90,7 +90,10 @@ export default async function AppAdminConsolePage({
             >
               Org admin
             </Link>
-            <SignOutButton />
+            <UserMenu
+              displayName={user.profile?.display_name}
+              email={user.email}
+            />
           </div>
         </div>
 

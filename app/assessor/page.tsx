@@ -4,7 +4,7 @@ import type { Route } from "next";
 import { getUser } from "@/lib/auth/getUser";
 import { supabaseServer, supabaseAdmin } from "@/lib/supabase/server";
 import { RunAnalysisButton } from "./RunAnalysisButton";
-import { SignOutButton } from "./SignOutButton";
+import { UserMenu } from "@/components/UserMenu";
 
 export const dynamic = "force-dynamic";
 
@@ -55,7 +55,12 @@ export default async function AssessorPage() {
     (m) => m.role === "assessor" || m.role === "org_admin",
   );
   if (!isAssessor) {
-    return <NoAccess displayName={user.profile?.display_name ?? user.email} />;
+    return (
+      <NoAccess
+        displayName={user.profile?.display_name ?? user.email}
+        email={user.email}
+      />
+    );
   }
 
   const supa = await supabaseServer();
@@ -122,7 +127,10 @@ export default async function AssessorPage() {
             >
               Start new interview
             </Link>
-            <SignOutButton />
+            <UserMenu
+              displayName={user.profile?.display_name}
+              email={user.email}
+            />
           </div>
         </div>
 
@@ -213,7 +221,13 @@ export default async function AssessorPage() {
   );
 }
 
-function NoAccess({ displayName }: { displayName: string | null }) {
+function NoAccess({
+  displayName,
+  email,
+}: {
+  displayName: string | null;
+  email: string | null;
+}) {
   return (
     <main className="min-h-dvh flex items-center justify-center bg-neutral-50 px-4">
       <div className="w-full max-w-md rounded-2xl border border-neutral-200 bg-white p-8 text-center shadow-sm">
@@ -225,7 +239,7 @@ function NoAccess({ displayName }: { displayName: string | null }) {
           Contact your org admin if you believe this is a mistake.
         </p>
         <div className="mt-6 flex justify-center">
-          <SignOutButton />
+          <UserMenu displayName={displayName} email={email} />
         </div>
       </div>
     </main>

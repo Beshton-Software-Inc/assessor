@@ -9,7 +9,7 @@ import type {
   SeatInviteRow,
   SubscriptionStatus,
 } from "@/lib/billing/types";
-import { SignOutButton } from "../org/SignOutButton";
+import { UserMenu } from "@/components/UserMenu";
 import {
   BillingOrgPicker,
   type BillingOrgPickerOption,
@@ -166,7 +166,10 @@ export default async function BillingPage({
                 Billing
               </h1>
             </div>
-            <SignOutButton />
+            <UserMenu
+              displayName={user.profile?.display_name}
+              email={user.email}
+            />
           </header>
           <div className="mt-8 rounded-2xl border border-neutral-200 bg-white p-6">
             <p className="text-sm text-neutral-600">
@@ -209,7 +212,10 @@ export default async function BillingPage({
                 Organization not found
               </h1>
             </div>
-            <SignOutButton />
+            <UserMenu
+              displayName={user.profile?.display_name}
+              email={user.email}
+            />
           </header>
         </div>
       </main>
@@ -745,7 +751,10 @@ function BillingHeader({
             Console
           </Link>
         )}
-        <SignOutButton />
+        <UserMenu
+          displayName={user.profile?.display_name}
+          email={user.email}
+        />
       </div>
     </header>
   );

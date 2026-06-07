@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseServer, supabaseAdmin } from "@/lib/supabase/server";
 import { listGrantsForSession, type GrantRow } from "@/lib/sharing/grants";
-import { SignOutButton } from "../../../SignOutButton";
+import { UserMenu } from "@/components/UserMenu";
 import { RevokeButton } from "./RevokeButton";
 import { CreateShareLinkForm } from "./CreateShareLinkForm";
 
@@ -112,7 +112,10 @@ export default async function StudentAccessPage({ params }: PageProps) {
               </span>
             </p>
           </div>
-          <SignOutButton />
+          <UserMenu
+            displayName={user.profile?.display_name}
+            email={user.email}
+          />
         </header>
 
         <p className="mt-6 max-w-2xl text-sm text-neutral-300">
