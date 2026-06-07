@@ -13,7 +13,9 @@
     "analyze": "tsx scripts/analyze-session.ts",
     "test:analyze": "tsx scripts/test-analyze.ts",
     "test:roles": "tsx scripts/test-roles.ts",
-    "test:rls": "tsx scripts/test-rls.ts"
+    "test:rls": "tsx scripts/test-rls.ts",
+    "test:share": "tsx scripts/test-share.ts",
+    "test:audit": "tsx scripts/test-audit.ts"
   },
   "dependencies": {
     "@google/genai": "^2.8.0",

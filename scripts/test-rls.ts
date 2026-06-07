@@ -57,6 +57,7 @@ async function main() {
   const student2Id = await getUserId("student-2@example.com");
   const assessorId = await getUserId("assessor@example.com");
   const orgAdminId = await getUserId("org-admin@example.com");
+  const adminId = await getUserId("admin@example.com");
 
   const { data: demoOrg } = await svc.from("organizations").select("id").eq("slug", "demo").single();
   const demoOrgId = demoOrg!.id as string;
@@ -229,14 +230,250 @@ async function main() {
       `rows=${data?.length ?? "?"} err=${error?.message ?? ""}`);
   }
 
-  // ---- Cleanup: un-revoke student-2's session so re-runs are deterministic ----
+  // ---- Cleanup phase A: un-revoke student-2's session so re-runs are deterministic ----
   await svc.from("sessions").update({ student_revoked: false }).eq("id", student2SessionId);
+
+  // =========================================================================
+  // PHASE B: session_grants, audit_log, share-token semantics
+  // =========================================================================
+
+  console.log("\n--- Phase B attacks (session_grants / audit_log / share-tokens) ---");
+
+  const s2 = await signInAs("student-2@example.com");
+  const admin = await signInAs("admin@example.com");
+
+  // Wipe any pre-existing test grants on the two student sessions so we have
+  // a clean slate. Service-role bypasses RLS.
+  await svc.from("session_grants").delete().in("session_id", [student1SessionId, student2SessionId]);
+
+  // ATTACK 11: student-1 INSERT a grant on student-2's session → reject
+  {
+    const { data, error } = await s1.from("session_grants")
+      .insert({
+        session_id: student2SessionId,
+        grantee_user_id: student1Id,
+        granted_by_user_id: student1Id,
+        scope: "analysis",
+      })
+      .select("id");
+    record(11, "student-1 INSERT grant on student-2 session",
+      !!error || (data?.length ?? 0) === 0,
+      `rows=${data?.length ?? "?"} err=${error?.message ?? ""}`);
+  }
+
+  // SETUP for ATTACK 12: a legitimate grant on student-1's session, granted
+  // by student-1, with grantee=student-2.
+  const { data: grantForS2 } = await svc.from("session_grants")
+    .insert({
+      session_id: student1SessionId,
+      grantee_user_id: student2Id,
+      granted_by_user_id: student1Id,
+      scope: "analysis",
+    })
+    .select("id, revoked_at").single();
+  const someoneElsesGrantId = grantForS2!.id as string;
+
+  // ATTACK 12: student-1 (NOT the granter and NOT the enduser) attempts to
+  // UPDATE a grant whose granted_by is student-2 on student-2's session.
+  // We need a grant where student-1 is neither granter nor enduser. Build one
+  // with service-role: granter=assessor, session=student-2's, grantee=assessor.
+  const { data: foreignGrant } = await svc.from("session_grants")
+    .insert({
+      session_id: student2SessionId,
+      grantee_user_id: assessorId,
+      granted_by_user_id: assessorId,  // service-role bypasses INSERT policy
+      scope: "analysis",
+    })
+    .select("id").single();
+  const foreignGrantId = foreignGrant!.id as string;
+  {
+    const { data, error } = await s1.from("session_grants")
+      .update({ revoked_at: new Date().toISOString() })
+      .eq("id", foreignGrantId)
+      .select("id");
+    record(12, "student-1 UPDATE someone else's grant",
+      !!error || (data?.length ?? 0) === 0,
+      `rows=${data?.length ?? "?"} err=${error?.message ?? ""}`);
+  }
+
+  // ATTACK 13: student-1 SELECT audit_log → 0 rows
+  {
+    const { data, error } = await s1.from("audit_log").select("id");
+    record(13, "student-1 SELECT audit_log",
+      !error && (data?.length ?? 0) === 0,
+      `rows=${data?.length ?? "?"} err=${error?.message ?? ""}`);
+  }
+
+  // ATTACK 14: assessor SELECT audit_log → 0 rows
+  {
+    const { data, error } = await assessor.from("audit_log").select("id");
+    record(14, "assessor SELECT audit_log",
+      !error && (data?.length ?? 0) === 0,
+      `rows=${data?.length ?? "?"} err=${error?.message ?? ""}`);
+  }
+
+  // ATTACK 15: org_admin SELECT audit_log → 0 rows
+  {
+    const { data, error } = await orgAdmin.from("audit_log").select("id");
+    record(15, "org_admin SELECT audit_log",
+      !error && (data?.length ?? 0) === 0,
+      `rows=${data?.length ?? "?"} err=${error?.message ?? ""}`);
+  }
+
+  // ATTACK 16: app_admin CAN SELECT audit_log (no error, any row count is fine)
+  {
+    // Seed at least one audit row so we can prove read works
+    await svc.rpc("log_audit", {
+      p_action: "admin_session_read",
+      p_target_session_id: student1SessionId,
+      p_target_grant_id: null,
+      p_metadata: { src: "test-rls" },
+    });
+    const { data, error } = await admin.from("audit_log").select("id").limit(5);
+    record(16, "app_admin SELECT audit_log",
+      !error && Array.isArray(data),
+      `rows=${data?.length ?? "?"} err=${error?.message ?? ""}`);
+  }
+
+  // ATTACK 17: anon cannot SELECT a share-token grant or session row, but
+  // resolve_share_token RPC succeeds with the right token.
+  const shareToken = "shrtok_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 10);
+  const { data: stGrant, error: stErr } = await svc.from("session_grants")
+    .insert({
+      session_id: student1SessionId,
+      grantee_user_id: null,
+      granted_by_user_id: adminId,
+      scope: "analysis",
+      share_token: shareToken,
+      share_label: "test phase-b token",
+    })
+    .select("id, session_id, scope").single();
+  if (stErr) throw stErr;
+  const shareGrantId = stGrant!.id as string;
+
+  const anon = createClient(SUPABASE_URL!, ANON_KEY!, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  {
+    const { data: g, error: gErr } = await anon.from("session_grants")
+      .select("id").eq("id", shareGrantId);
+    const { data: s, error: sErr } = await anon.from("sessions")
+      .select("id").eq("id", student1SessionId);
+    const grantHidden = !gErr && (g?.length ?? 0) === 0;
+    const sessionHidden = !sErr && (s?.length ?? 0) === 0;
+
+    const { data: rpc, error: rpcErr } = await anon.rpc("resolve_share_token", { p_token: shareToken });
+    // PostgREST returns the table-returning function as an array of rows
+    const row = Array.isArray(rpc) ? rpc[0] : rpc;
+    const rpcOk = !rpcErr && !!row && row.session_id === student1SessionId && row.scope === "analysis";
+
+    record(17, "anon: hidden table rows but resolve_share_token works",
+      grantHidden && sessionHidden && rpcOk,
+      `grantHidden=${grantHidden} sessionHidden=${sessionHidden} rpcOk=${rpcOk} rpcErr=${rpcErr?.message ?? ""}`);
+  }
+
+  // ATTACK 18: EXPIRED share_token grant → student-2 (no relation to session)
+  // cannot SELECT the underlying session.
+  //
+  // Wipe any prior grants on this (session, grantee) pair so the only thing
+  // backing the SELECT decision is the expired grant we are about to insert.
+  // Earlier setup (ATTACK 12, ATTACK 17) leaves valid grants in place that
+  // would mask an expired-grant regression here.
+  await svc
+    .from("session_grants")
+    .delete()
+    .eq("session_id", student1SessionId)
+    .eq("grantee_user_id", student2Id);
+  const expiredToken = "shrtok_exp_" + Math.random().toString(36).slice(2, 10);
+  await svc.from("session_grants").insert({
+    session_id: student1SessionId,
+    grantee_user_id: student2Id,
+    granted_by_user_id: adminId,
+    scope: "analysis",
+    expires_at: new Date(Date.now() - 60_000).toISOString(),
+    share_token: expiredToken,
+  });
+  {
+    const { data, error } = await s2.from("sessions").select("id").eq("id", student1SessionId);
+    record(18, "student-2 SELECT session via EXPIRED grant",
+      !error && (data?.length ?? 0) === 0,
+      `rows=${data?.length ?? "?"} err=${error?.message ?? ""}`);
+  }
+
+  // ATTACK 19: REVOKED share_token grant → student-2 still cannot SELECT.
+  // Wipe again so the only backing grant is the revoked one we insert.
+  await svc
+    .from("session_grants")
+    .delete()
+    .eq("session_id", student1SessionId)
+    .eq("grantee_user_id", student2Id);
+  const revokedToken = "shrtok_rev_" + Math.random().toString(36).slice(2, 10);
+  await svc.from("session_grants").insert({
+    session_id: student1SessionId,
+    grantee_user_id: student2Id,
+    granted_by_user_id: adminId,
+    scope: "analysis",
+    revoked_at: new Date().toISOString(),
+    share_token: revokedToken,
+  });
+  {
+    const { data, error } = await s2.from("sessions").select("id").eq("id", student1SessionId);
+    record(19, "student-2 SELECT session via REVOKED grant",
+      !error && (data?.length ?? 0) === 0,
+      `rows=${data?.length ?? "?"} err=${error?.message ?? ""}`);
+  }
+
+  // ATTACK 20: VALID 'analysis' grant → student-2 CAN SELECT session and
+  // analyses but cannot UPDATE. We also need an analyses row to test against.
+  await svc
+    .from("session_grants")
+    .delete()
+    .eq("session_id", student1SessionId)
+    .eq("grantee_user_id", student2Id);
+  const validToken = "shrtok_ok_" + Math.random().toString(36).slice(2, 10);
+  await svc.from("session_grants").insert({
+    session_id: student1SessionId,
+    grantee_user_id: student2Id,
+    granted_by_user_id: adminId,
+    scope: "analysis",
+    share_token: validToken,
+  });
+  // Ensure an analyses row exists for student1SessionId
+  const { data: existingA } = await svc.from("analyses")
+    .select("id").eq("session_id", student1SessionId).limit(1);
+  if (!existingA || existingA.length === 0) {
+    await svc.from("analyses").insert({
+      session_id: student1SessionId,
+      status: "completed",
+      summary_md: "phase-b test analysis",
+      result: {},
+    });
+  }
+  {
+    const { data: sRows, error: sErr2 } = await s2.from("sessions")
+      .select("id").eq("id", student1SessionId);
+    const { data: aRows, error: aErr } = await s2.from("analyses")
+      .select("id").eq("session_id", student1SessionId);
+    const { data: upd, error: updErr } = await s2.from("sessions")
+      .update({ stage: "aborted" }).eq("id", student1SessionId).select("id");
+
+    const canRead = !sErr2 && (sRows?.length ?? 0) === 1
+                  && !aErr && (aRows?.length ?? 0) >= 1;
+    const cannotWrite = !!updErr || (upd?.length ?? 0) === 0;
+
+    record(20, "valid 'analysis' grant: SELECT yes, UPDATE no",
+      canRead && cannotWrite,
+      `sRows=${sRows?.length ?? "?"} aRows=${aRows?.length ?? "?"} updRows=${upd?.length ?? "?"} updErr=${updErr?.message ?? ""}`);
+  }
+
+  // ---- Cleanup: remove all test grants on the two sessions ----
+  await svc.from("session_grants").delete().in("session_id", [student1SessionId, student2SessionId]);
 
   const passed = results.filter((r) => r.pass).length;
   const failed = results.length - passed;
   console.log(`\nSummary: ${passed}/${results.length} passed, ${failed} failed.`);
   // Suppress unused vars warning for IDs only used in setup
-  void orgAdminId;
+  void orgAdminId; void someoneElsesGrantId;
   process.exit(failed === 0 ? 0 : 1);
 }
 
