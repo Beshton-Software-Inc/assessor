@@ -26,29 +26,47 @@ export async function listOrgEndusers(
   q?: string,
   limit = 50,
 ): Promise<OrgEnduser[]> {
+  // org_members and profiles both reference auth.users(id) but have no
+  // direct FK between each other, so PostgREST can't infer the embed.
+  // We fetch them in two queries and join in JS — N is small (tens to low
+  // hundreds per org). Email comes from auth.users via the admin client.
   const { data: members, error: memberErr } = await supa
     .from("org_members")
-    .select("user_id, role, profiles:profiles!inner(user_id, display_name)")
+    .select("user_id, role")
     .eq("org_id", orgId)
     .eq("role", "enduser");
   if (memberErr) {
     throw new Error(`listOrgEndusers (members) failed: ${memberErr.message}`);
   }
 
-  type Row = {
-    user_id: string;
-    profiles?: { user_id: string; display_name: string | null } | null;
-  };
-  const rows = (members ?? []) as unknown as Row[];
+  const memberRows = (members ?? []) as Array<{ user_id: string; role: string }>;
+  const userIds = memberRows.map((m) => m.user_id);
+
+  const profileByUserId = new Map<string, string | null>();
+  if (userIds.length > 0) {
+    const { data: profileRows, error: profileErr } = await supa
+      .from("profiles")
+      .select("user_id, display_name")
+      .in("user_id", userIds);
+    if (profileErr) {
+      throw new Error(`listOrgEndusers (profiles) failed: ${profileErr.message}`);
+    }
+    for (const p of (profileRows ?? []) as Array<{
+      user_id: string;
+      display_name: string | null;
+    }>) {
+      profileByUserId.set(p.user_id, p.display_name);
+    }
+  }
 
   const admin = supabaseAdmin();
   const enriched = await Promise.all(
-    rows.map(async (m) => {
+    memberRows.map(async (m) => {
       const { data: u } = await admin.auth.admin.getUserById(m.user_id);
       return {
         userId: m.user_id,
         email: u?.user?.email ?? "",
-        displayName: m.profiles?.display_name ?? null,
+        displayName: profileByUserId.get(m.user_id) ?? null,
       } satisfies OrgEnduser;
     }),
   );
