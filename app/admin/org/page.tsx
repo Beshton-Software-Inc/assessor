@@ -129,6 +129,37 @@ export default async function OrgAdminPage({
   const orgs = (orgRows ?? []) as OrgRow[];
   const selectedOrg = orgs.find((o) => o.id === selectedOrgId) ?? null;
 
+  // Phase C: load the subscription row for the selected org so we can
+  // render an upgrade nudge banner when the trial is about to lapse.
+  let subscriptionStatus: string | null = null;
+  if (selectedOrg) {
+    const { data: subRow } = await supa
+      .from("subscriptions")
+      .select("status")
+      .eq("org_id", selectedOrg.id)
+      .maybeSingle();
+    subscriptionStatus =
+      (subRow as { status: string } | null)?.status ?? null;
+  }
+  // "Trial ends in N days" banner: trialing + trial_ends_at within 7 days.
+  let trialDaysRemaining: number | null = null;
+  if (
+    subscriptionStatus === "trialing" &&
+    selectedOrg?.trial_ends_at
+  ) {
+    const trialEndsMs = new Date(selectedOrg.trial_ends_at).getTime();
+    if (!Number.isNaN(trialEndsMs)) {
+      const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+      if (trialEndsMs < Date.now() + sevenDaysMs) {
+        const days = Math.max(
+          0,
+          Math.ceil((trialEndsMs - Date.now()) / (24 * 60 * 60 * 1000)),
+        );
+        trialDaysRemaining = days;
+      }
+    }
+  }
+
   if (!selectedOrg) {
     return (
       <main className="min-h-dvh bg-neutral-50 px-6 py-12">
@@ -274,6 +305,24 @@ export default async function OrgAdminPage({
   return (
     <main className="min-h-dvh bg-neutral-50 px-6 py-12">
       <div className="mx-auto max-w-4xl">
+        {trialDaysRemaining !== null && (
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <span>
+              Trial ends in{" "}
+              <span className="font-semibold">
+                {trialDaysRemaining}{" "}
+                {trialDaysRemaining === 1 ? "day" : "days"}
+              </span>
+              .
+            </span>
+            <Link
+              href={"/admin/billing" as Route}
+              className="rounded-lg border border-amber-400 bg-white px-3 py-1.5 text-sm font-medium text-amber-900 hover:bg-amber-100"
+            >
+              Subscribe
+            </Link>
+          </div>
+        )}
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
