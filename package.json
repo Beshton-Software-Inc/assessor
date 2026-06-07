@@ -11,7 +11,9 @@
     "download": "tsx scripts/download-session.ts",
     "test:download": "tsx scripts/test-download.ts",
     "analyze": "tsx scripts/analyze-session.ts",
-    "test:analyze": "tsx scripts/test-analyze.ts"
+    "test:analyze": "tsx scripts/test-analyze.ts",
+    "test:roles": "tsx scripts/test-roles.ts",
+    "test:rls": "tsx scripts/test-rls.ts"
   },
   "dependencies": {
     "@google/genai": "^2.8.0",
