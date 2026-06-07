@@ -117,7 +117,7 @@ export default async function AssessorPage() {
           </div>
           <div className="flex items-center gap-2">
             <Link
-              href={"/" as Route}
+              href={"/assessor/start" as Route}
               className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800"
             >
               Start new interview

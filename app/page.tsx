@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import type { Route } from "next";
 import { getUser } from "@/lib/auth/getUser";
+import { InterviewClient } from "@/components/InterviewClient";
 
 // Next.js 15 typed routes treats redirect() as taking Route<string>; the
 // landing-page paths we resolve are dynamic, so cast at the boundary.
@@ -10,11 +11,24 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Root entry point. Decides where the visitor belongs based on auth +
- * org-membership state and redirects there. The interview UI is no longer
- * mounted at `/` — assessors launch interviews from `/assessor`.
+ * Root entry point.
+ *
+ * Auth/role logic: signed-out users go to /login; app_admin and org_admin go
+ * to their consoles; endusers go to /student.
+ *
+ * Assessor flow:
+ * - With ?sessionId=… → mount the live interview UI here. The session has
+ *   already been paired with an enduser via /assessor/start → POST
+ *   /api/sessions/start, so InterviewClient just consumes the existing id.
+ * - Without ?sessionId= → bounce to /assessor/start so the assessor picks or
+ *   invites a student before the call begins. This enforces the phase-B
+ *   pairing flow and prevents a null enduser_id.
  */
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const user = await getUser();
   if (!user) redirect(route("/login"));
 
@@ -22,7 +36,15 @@ export default async function Home() {
 
   const memberships = user.memberships;
   if (memberships.some((m) => m.role === "org_admin")) redirect(route("/admin/org"));
-  if (memberships.some((m) => m.role === "assessor")) redirect(route("/assessor"));
+
+  if (memberships.some((m) => m.role === "assessor")) {
+    const params = await searchParams;
+    const raw = params.sessionId;
+    const sessionId = Array.isArray(raw) ? raw[0] : raw;
+    if (!sessionId) redirect(route("/assessor/start"));
+    return <InterviewClient sessionId={sessionId} />;
+  }
+
   if (memberships.some((m) => m.role === "enduser")) redirect(route("/student"));
 
   // Signed in but no org membership and not an app admin: render a friendly

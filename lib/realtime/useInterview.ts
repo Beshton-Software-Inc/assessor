@@ -77,15 +77,25 @@ export function useInterview() {
   useEffect(() => () => teardown(), [teardown]);
 
   const start = useCallback(
-    async (aiAudioEl: HTMLAudioElement) => {
+    async (
+      aiAudioEl: HTMLAudioElement,
+      opts?: { sessionId?: string },
+    ) => {
       aiAudioElRef.current = aiAudioEl;
       setState({ ...initialState, phase: "preparing" });
 
       try {
-        const sessionRes = await fetch("/api/sessions", { method: "POST" });
-        if (!sessionRes.ok) throw new Error("Could not create session record");
-        const { sessionId } = (await sessionRes.json()) as { sessionId: string };
-        sessionIdRef.current = sessionId;
+        // Phase B: sessions are now pre-created by /assessor/start →
+        // /api/sessions/start with a paired enduser. The legacy POST
+        // /api/sessions path returns 400; if we get here without a
+        // pre-created id the user came in by an unsupported route.
+        if (opts?.sessionId) {
+          sessionIdRef.current = opts.sessionId;
+        } else {
+          throw new Error(
+            "No session id. Start an interview from the assessor pairing page.",
+          );
+        }
 
         const tokenRes = await fetch("/api/realtime/session", { method: "POST" });
         if (!tokenRes.ok) throw new Error("Could not authorize voice session");

@@ -7,7 +7,7 @@ import { LiveInterview } from "./LiveInterview";
 import { DoneScreen } from "./DoneScreen";
 import { ErrorScreen } from "./ErrorScreen";
 
-export function InterviewClient() {
+export function InterviewClient({ sessionId }: { sessionId?: string } = {}) {
   const { state, start, finish } = useInterview();
   const aiAudioRef = useRef<HTMLAudioElement>(null);
 
@@ -18,7 +18,7 @@ export function InterviewClient() {
 
   const handleBegin = async () => {
     if (!aiAudioRef.current) return;
-    await start(aiAudioRef.current);
+    await start(aiAudioRef.current, sessionId ? { sessionId } : undefined);
   };
 
   return (
