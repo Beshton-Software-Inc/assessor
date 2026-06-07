@@ -1,7 +1,8 @@
 "use client";
 
 import { Suspense, useState, type FormEvent } from "react";
-import { useSearchParams } from "next/navigation";
+import type { Route } from "next";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
 type Provider = "google" | "azure" | "apple";
@@ -17,14 +18,17 @@ export default function LoginPage() {
 }
 
 function LoginPageInner() {
+  const router = useRouter();
   const params = useSearchParams();
   const errorParam = params.get("error");
   const nextParam = params.get("next");
 
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
-    "idle",
-  );
+  const [password, setPassword] = useState("");
+  const [mode, setMode] = useState<"password" | "magic">("password");
+  const [status, setStatus] = useState<
+    "idle" | "submitting" | "sent" | "error"
+  >("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(
     errorParam ? decodeURIComponent(errorParam) : null,
   );
@@ -46,10 +50,28 @@ function LoginPageInner() {
     if (error) setErrorMsg(error.message);
   }
 
+  async function signInPassword(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setErrorMsg(null);
+    setStatus("submitting");
+    const supa = supabaseBrowser();
+    const { error } = await supa.auth.signInWithPassword({ email, password });
+    if (error) {
+      setStatus("error");
+      setErrorMsg(error.message);
+      return;
+    }
+    // Session cookie is set; bounce through "/" so the server-side role
+    // redirect in app/page.tsx routes to the right dashboard. router.refresh()
+    // ensures the new auth cookie is picked up by the next server render.
+    router.refresh();
+    router.replace((nextParam ?? "/") as Route);
+  }
+
   async function signInMagic(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrorMsg(null);
-    setStatus("sending");
+    setStatus("submitting");
     const supa = supabaseBrowser();
     const { error } = await supa.auth.signInWithOtp({
       email,
@@ -68,7 +90,7 @@ function LoginPageInner() {
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-sm border border-neutral-200">
         <h1 className="text-2xl font-semibold text-neutral-900">Sign in</h1>
         <p className="mt-1 text-sm text-neutral-500">
-          Use a provider or your email to continue.
+          Use a provider, or sign in with your email and password.
         </p>
 
         {errorMsg && (
@@ -107,35 +129,74 @@ function LoginPageInner() {
           <div className="h-px flex-1 bg-neutral-200" />
         </div>
 
-        <form onSubmit={signInMagic} className="space-y-3">
+        <form
+          onSubmit={mode === "password" ? signInPassword : signInMagic}
+          className="space-y-3"
+        >
           <label className="block text-sm font-medium text-neutral-700">
             Email
             <input
               type="email"
               required
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none"
-              disabled={status === "sending" || status === "sent"}
+              disabled={status === "submitting" || status === "sent"}
             />
           </label>
+
+          {mode === "password" && (
+            <label className="block text-sm font-medium text-neutral-700">
+              Password
+              <input
+                type="password"
+                required
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none"
+                disabled={status === "submitting"}
+              />
+            </label>
+          )}
+
           <button
             type="submit"
-            disabled={status === "sending" || status === "sent"}
+            disabled={status === "submitting" || status === "sent"}
             className="w-full rounded-lg bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-neutral-800 disabled:opacity-50"
           >
-            {status === "sending"
-              ? "Sending…"
+            {status === "submitting"
+              ? mode === "password"
+                ? "Signing in…"
+                : "Sending…"
               : status === "sent"
               ? "Check your inbox"
+              : mode === "password"
+              ? "Sign in"
               : "Send magic link"}
           </button>
-          {status === "sent" && (
+
+          {status === "sent" && mode === "magic" && (
             <p className="text-sm text-neutral-600">
               We emailed a sign-in link to <strong>{email}</strong>.
             </p>
           )}
+
+          <button
+            type="button"
+            onClick={() => {
+              setMode((m) => (m === "password" ? "magic" : "password"));
+              setErrorMsg(null);
+              setStatus("idle");
+            }}
+            className="block w-full text-xs text-neutral-500 hover:text-neutral-900 underline-offset-2 hover:underline"
+          >
+            {mode === "password"
+              ? "Or sign in with a magic link"
+              : "Sign in with a password instead"}
+          </button>
         </form>
       </div>
     </main>
