@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEAD — Page 3: Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal:#0D9488;--teal-bright:#14B8A6;--teal-deep:#0F766E;
+    --coral:#FF6B4A;--coral-dark:#F4502B;
+    --ink:#0B2B29;--read:#1B2B2A;--slate:#5B7270;--bg:#F4FBFA;--card:#FFFFFF;--line:#E2EFED;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Hanken Grotesk',sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%, #E7F6F4 0%, transparent 60%),#EAF2F1;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:32px 16px;color:var(--ink);
+  }
+  .label{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--slate);margin-bottom:14px;font-weight:600;}
+
+  .phone{
+    width:390px;max-width:100%;height:780px;background:#0B2B29;border-radius:46px;padding:12px;
+    box-shadow:0 40px 80px -30px rgba(11,43,41,.55),0 0 0 1px rgba(0,0,0,.04);position:relative;
+  }
+  .screen{position:relative;width:100%;height:100%;background:var(--bg);border-radius:36px;overflow:hidden;display:flex;flex-direction:column;}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:26px;background:#0B2B29;border-radius:0 0 16px 16px;z-index:30;}
+
+  .head{padding:40px 22px 0;}
+  .prog{display:flex;align-items:center;gap:10px;}
+  .back{font-size:20px;color:var(--slate);text-decoration:none;line-height:1;}
+  .bar{flex:1;height:6px;background:#DCEEEB;border-radius:99px;overflow:hidden;}
+  .bar > i{display:block;height:100%;width:50%;background:linear-gradient(90deg,var(--teal-bright),var(--teal));border-radius:99px;}
+  .pgnum{font-size:11.5px;font-weight:600;color:var(--slate);}
+  .stage{display:flex;align-items:center;justify-content:space-between;margin-top:14px;}
+  .stage .chip{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--teal-deep);}
+  .stage .chip .num{width:22px;height:22px;border-radius:7px;background:var(--teal);color:#fff;font-family:'Bricolage Grotesque';font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;}
+  .stage .rt{font-size:11.5px;font-weight:600;color:var(--slate);background:#EAF6F4;padding:5px 10px;border-radius:99px;}
+
+  .body{flex:1;overflow-y:auto;padding:14px 22px 108px;}
+  .body::-webkit-scrollbar{display:none;}
+
+  /* video player */
+  .video{position:relative;border-radius:18px;overflow:hidden;height:208px;margin-bottom:16px;
+    background:radial-gradient(120% 120% at 80% 0%, #15B5A6 0%, #0E7F75 55%, #0B5F58 100%);
+    box-shadow:0 18px 38px -20px rgba(13,148,136,.7);}
+  .poster{position:absolute;inset:0;padding:18px;transition:opacity .3s;}
+  .playing .poster{opacity:.4;}
+  .poster .pov{font-family:'Bricolage Grotesque';font-weight:800;font-size:50px;color:rgba(255,255,255,.96);letter-spacing:-.02em;line-height:1;}
+  .poster .bub{display:inline-block;font-size:12px;font-weight:600;padding:6px 11px;border-radius:13px;margin-top:10px;}
+  .poster .b-old{background:rgba(255,255,255,.18);color:rgba(255,255,255,.85);text-decoration:line-through;}
+  .poster .b-new{background:#fff;color:var(--teal-deep);margin-left:8px;}
+
+  .bigplay{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;border-radius:50%;
+    background:var(--coral);display:flex;align-items:center;justify-content:center;cursor:pointer;
+    box-shadow:0 12px 26px -8px rgba(244,80,43,.7);transition:.2s;border:none;}
+  .bigplay:hover{transform:translate(-50%,-50%) scale(1.06);}
+  .bigplay svg{margin-left:3px;}
+  .playing .bigplay{display:none;}
+
+  .vctrl{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:10px;padding:11px 13px;
+    background:linear-gradient(to top,rgba(4,20,18,.7),transparent);}
+  .vctrl .pp{cursor:pointer;color:#fff;display:flex;}
+  .vtrack{flex:1;height:4px;background:rgba(255,255,255,.3);border-radius:99px;overflow:hidden;}
+  .vtrack > i{display:block;height:100%;width:0%;background:var(--coral);border-radius:99px;}
+  .vtime{font-size:11px;color:#fff;font-weight:600;font-variant-numeric:tabular-nums;}
+
+  .qhead{font-family:'Bricolage Grotesque';font-weight:800;font-size:21px;line-height:1.18;letter-spacing:-.01em;margin-bottom:14px;}
+
+  .pl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal-deep);margin-bottom:9px;}
+  .persp{display:flex;gap:11px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:10px 12px;margin-bottom:8px;box-shadow:0 8px 18px -16px rgba(13,148,136,.4);}
+  .persp .pn{flex:none;width:24px;height:24px;border-radius:7px;background:#EAF6F4;color:var(--teal-deep);font-family:'Bricolage Grotesque';font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;}
+  .persp .pt{font-size:12.5px;line-height:1.35;color:var(--read);}
+  .persp .pt b{color:var(--ink);font-weight:700;}
+
+  .task{background:#EAF6F4;border-radius:13px;padding:11px 14px;margin-top:11px;font-size:12.5px;color:var(--teal-deep);font-weight:600;line-height:1.45;}
+  .task b{color:var(--ink);}
+
+  .foot{position:absolute;left:0;right:0;bottom:0;z-index:20;padding:14px 22px 26px;background:linear-gradient(to top,var(--bg) 62%,transparent);}
+  .cta{width:100%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--coral),var(--coral-dark));color:#fff;font-family:'Hanken Grotesk';font-weight:700;font-size:16px;padding:17px;border-radius:17px;box-shadow:0 16px 30px -12px rgba(244,80,43,.6);transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .cta:hover{transform:translateY(-2px);}
+  .hint{text-align:center;font-size:11px;color:var(--slate);margin-top:9px;}
+
+  .caption{margin-top:24px;font-size:12.5px;color:var(--slate);max-width:390px;text-align:center;line-height:1.5;}
+  .caption b{color:var(--ink);}
+</style>
+</head>
+<body>
+  <div class="label">LEAD · Page 3 of 8 — Watch the Topic</div>
+
+  <div class="phone">
+    <div class="screen" id="screen">
+      <div class="notch"></div>
+
+      <div class="head">
+        <div class="prog">
+          <a class="back" href="#">‹</a>
+          <div class="bar"><i></i></div>
+          <div class="pgnum">Step 2 of 4</div>
+        </div>
+        <div class="stage">
+          <div class="chip"><span class="num">1</span> Watch</div>
+          <div class="rt">▶ 0:48</div>
+        </div>
+      </div>
+
+      <div class="body">
+        <div class="video" id="video">
+          <div class="poster">
+            <div class="pov">POV</div>
+            <div>
+              <span class="bub b-old">"point of view"</span>
+              <span class="bub b-new">"imagine this is you" 👀</span>
+            </div>
+          </div>
+          <button class="bigplay" id="bigplay" onclick="togglePlay()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <div class="vctrl">
+            <span class="pp" id="pp" onclick="togglePlay()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+            </span>
+            <div class="vtrack"><i id="vfill"></i></div>
+            <span class="vtime" id="vtime">0:00 / 0:48</span>
+          </div>
+        </div>
+
+        <h1 class="qhead">Is changing words online clever — or just wrong?</h1>
+
+        <div class="pl">While you watch, consider</div>
+        <div class="persp"><div class="pn">1</div><div class="pt"><b>Creativity</b> — reinvention is good; embrace it.</div></div>
+        <div class="persp"><div class="pn">2</div><div class="pt"><b>Clarity</b> — shared meaning matters; resist the blur.</div></div>
+        <div class="persp"><div class="pn">3</div><div class="pt"><b>Who it serves</b> — does it include people, or leave them out?</div></div>
+
+        <div class="task"><b>In your talk:</b> where do you stand? Weigh all three, and back it up with an example.</div>
+      </div>
+
+      <div class="foot">
+        <button class="cta">I'm ready to present <span>→</span></button>
+        <div class="hint">Take a moment to gather your thoughts</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="caption"><b>Page 3 — watch (video version).</b> The topic is delivered as a short clip (tap play to preview the simulated playback) instead of an article — the "more visual, less reading" fix. The three perspectives sit below for reference, then straight to presenting. <i>Note: a video stimulus means producing your own clips, which sidesteps third-party licensing.</i></p>
+
+<script>
+  var screen=document.getElementById('screen'),vfill=document.getElementById('vfill'),
+      vtime=document.getElementById('vtime'),pp=document.getElementById('pp');
+  var DUR=48, playing=false, p=0, iv=null;
+  var playSVG='<svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>';
+  var pauseSVG='<svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
+
+  function fmt(s){var m=Math.floor(s/60),ss=Math.floor(s%60);return m+':'+(ss<10?'0':'')+ss;}
+  function render(){vfill.style.width=(p/DUR*100)+'%';vtime.textContent=fmt(p)+' / 0:48';}
+
+  function togglePlay(){
+    if(playing){pause();} else {play();}
+  }
+  function play(){
+    playing=true;screen.classList.add('playing');pp.innerHTML=pauseSVG;
+    iv=setInterval(function(){
+      p+=0.25; // 4x speed for preview
+      if(p>=DUR){p=DUR;render();pause();return;}
+      render();
+    },60);
+  }
+  function pause(){
+    playing=false;screen.classList.remove('playing');pp.innerHTML=playSVG;
+    if(iv){clearInterval(iv);iv=null;}
+  }
+  render();
+</script>
+</body>
+</html>

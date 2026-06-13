@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEAD — Page 1: Landing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal:#0D9488;
+    --teal-bright:#14B8A6;
+    --teal-deep:#0F766E;
+    --coral:#FF6B4A;
+    --coral-dark:#F4502B;
+    --ink:#0B2B29;
+    --slate:#5B7270;
+    --bg:#F4FBFA;
+    --card:#FFFFFF;
+    --line:#E2EFED;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Hanken Grotesk',sans-serif;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #E7F6F4 0%, transparent 60%),
+      #EAF2F1;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:32px 16px;
+    color:var(--ink);
+  }
+  .label{
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--slate);margin-bottom:14px;font-weight:600;
+  }
+
+  /* ---- phone frame ---- */
+  .phone{
+    width:390px;max-width:100%;
+    height:780px;
+    background:#0B2B29;
+    border-radius:46px;
+    padding:12px;
+    box-shadow:0 40px 80px -30px rgba(11,43,41,.55), 0 0 0 1px rgba(0,0,0,.04);
+    position:relative;
+  }
+  .screen{
+    position:relative;
+    width:100%;height:100%;
+    background:var(--bg);
+    border-radius:36px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  .notch{
+    position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:120px;height:26px;background:#0B2B29;border-radius:0 0 16px 16px;z-index:30;
+  }
+
+  /* ---- atmosphere ---- */
+  .blob{
+    position:absolute;border-radius:50%;filter:blur(8px);opacity:.5;z-index:0;
+  }
+  .blob1{width:240px;height:240px;background:radial-gradient(circle,#9DECE4,transparent 70%);top:-60px;right:-70px;}
+  .blob2{width:200px;height:200px;background:radial-gradient(circle,#FFD2C4,transparent 70%);bottom:120px;left:-80px;opacity:.6;}
+
+  /* ---- top bar ---- */
+  .topbar{
+    position:relative;z-index:10;
+    padding:42px 26px 0;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .brand{display:flex;align-items:center;gap:9px;}
+  .brand-mark{
+    width:30px;height:30px;border-radius:9px;
+    background:linear-gradient(140deg,var(--teal-bright),var(--teal-deep));
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-family:'Bricolage Grotesque';font-weight:800;font-size:17px;
+    box-shadow:0 6px 14px -4px rgba(13,148,136,.6);
+  }
+  .brand-name{font-family:'Bricolage Grotesque';font-weight:700;font-size:18px;letter-spacing:-.01em;}
+  .pill{
+    font-size:11.5px;font-weight:600;color:var(--teal-deep);
+    background:#D7F2EE;padding:6px 11px;border-radius:999px;
+  }
+
+  /* ---- hero ---- */
+  .hero{
+    position:relative;z-index:10;
+    flex:1;
+    padding:18px 26px 0;
+    display:flex;flex-direction:column;
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:12.5px;font-weight:600;color:var(--teal-deep);
+    margin-bottom:20px;
+  }
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 4px rgba(255,107,74,.18);}
+
+  h1{
+    font-family:'Bricolage Grotesque';
+    font-weight:800;
+    font-size:40px;
+    line-height:1.02;
+    letter-spacing:-.025em;
+    margin-bottom:15px;
+  }
+  h1 .hl{color:var(--teal);position:relative;white-space:nowrap;}
+  .sub{
+    font-size:16.5px;line-height:1.5;color:var(--slate);
+    max-width:300px;font-weight:500;
+  }
+
+  /* ---- zig-zag flow ---- */
+  .flow{
+    position:relative;z-index:10;
+    flex:1;
+    margin-top:18px;
+    display:flex;flex-direction:column;
+    justify-content:center;
+  }
+  .step{
+    width:64%;
+    background:var(--card);border:1px solid var(--line);
+    border-radius:18px;padding:13px 15px;
+    display:flex;align-items:center;gap:13px;
+    box-shadow:0 12px 26px -16px rgba(13,148,136,.5);
+  }
+  .step.left{align-self:flex-start;}
+  .step.right{align-self:flex-end;}
+  .step .n{
+    flex:none;
+    font-family:'Bricolage Grotesque';font-weight:800;font-size:17px;
+    color:#fff;width:36px;height:36px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .step.s1 .n{background:var(--teal);}
+  .step.s2 .n{background:var(--teal-bright);}
+  .step.s3 .n{background:var(--coral);}
+  .step .t{font-size:15.5px;font-weight:700;color:var(--ink);line-height:1.1;}
+  .step .d{font-size:11.5px;color:var(--slate);margin-top:3px;line-height:1.2;}
+
+  /* connector arrows */
+  .conn{height:34px;display:flex;align-items:center;justify-content:center;}
+  .conn.left svg{transform:scaleX(-1);}
+  .conn path{stroke:var(--teal-bright);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;fill:none;}
+  .conn .curve{stroke-dasharray:1.5 7;}
+
+  /* ---- footer / CTA ---- */
+  .foot{
+    position:relative;z-index:10;
+    padding:20px 26px 30px;
+  }
+  .cta{
+    width:100%;border:none;cursor:pointer;
+    background:linear-gradient(135deg,var(--coral),var(--coral-dark));
+    color:#fff;font-family:'Hanken Grotesk';font-weight:700;font-size:17px;
+    padding:18px;border-radius:18px;
+    box-shadow:0 16px 30px -12px rgba(244,80,43,.7);
+    transition:transform .15s ease, box-shadow .15s ease;
+    display:flex;align-items:center;justify-content:center;gap:9px;
+  }
+  .cta:hover{transform:translateY(-2px);box-shadow:0 22px 36px -12px rgba(244,80,43,.75);}
+  .cta:active{transform:translateY(0);}
+  .cta .arrow{font-size:19px;transition:transform .15s ease;}
+  .cta:hover .arrow{transform:translateX(4px);}
+  .trust{
+    margin-top:16px;display:flex;align-items:center;justify-content:center;gap:16px;
+    font-size:12px;color:var(--slate);font-weight:500;
+  }
+  .trust span{display:inline-flex;align-items:center;gap:5px;}
+  .check{color:var(--teal);font-weight:800;}
+
+  .caption{margin-top:24px;font-size:12.5px;color:var(--slate);max-width:390px;text-align:center;line-height:1.5;}
+  .caption b{color:var(--ink);}
+</style>
+</head>
+<body>
+  <div class="label">LEAD · Page 1 of 8 — Landing / Hook</div>
+
+  <div class="phone">
+    <div class="screen">
+      <div class="notch"></div>
+      <div class="blob blob1"></div>
+      <div class="blob blob2"></div>
+
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-mark">L</div>
+          <div class="brand-name">LEAD</div>
+        </div>
+        <div class="pill">≈ 15 min</div>
+      </div>
+
+      <div class="hero">
+        <div class="eyebrow"><span class="dot"></span> Your college-readiness check</div>
+        <h1>Get ready for a <span class="hl">great college.</span></h1>
+        <p class="sub">A quick check that shows where you stand — and how to stand out.</p>
+
+        <div class="flow">
+          <div class="step left s1">
+            <div class="n">1</div>
+            <div><div class="t">Watch</div><div class="d">A video</div></div>
+          </div>
+
+          <div class="conn right">
+            <svg width="150" height="34" viewBox="0 0 150 34" fill="none">
+              <path class="curve" d="M22 6 Q 84 4 124 28"/>
+              <path d="M124 28 L112 22 M124 28 L116 34"/>
+            </svg>
+          </div>
+
+          <div class="step right s2">
+            <div class="n">2</div>
+            <div><div class="t">Present</div><div class="d">Share your take</div></div>
+          </div>
+
+          <div class="conn left">
+            <svg width="150" height="34" viewBox="0 0 150 34" fill="none">
+              <path class="curve" d="M22 6 Q 84 4 124 28"/>
+              <path d="M124 28 L112 22 M124 28 L116 34"/>
+            </svg>
+          </div>
+
+          <div class="step left s3">
+            <div class="n">3</div>
+            <div><div class="t">Q&amp;A</div><div class="d">A quick back-and-forth</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="foot">
+        <button class="cta">Start free <span class="arrow">→</span></button>
+        <div class="trust">
+          <span><span class="check">✓</span> Free</span>
+          <span><span class="check">✓</span> Private by choice</span>
+          <span><span class="check">✓</span> 15 minutes</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="caption">
+    <b>Page 1 — the hook.</b> One headline, one promise, one button — no scrolling needed.
+    The "≈ 15 min" pill and the 3-step strip do the heavy lifting: they signal <i>low effort, clearly doable</i> at a glance, which serves the data-collection goal. Coral CTA pops against the teal system to pull the tap.
+  </p>
+</body>
+</html>

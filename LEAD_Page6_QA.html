@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEAD — Page 6: Q&A</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal:#0D9488;--teal-bright:#14B8A6;--teal-deep:#0F766E;
+    --coral:#FF6B4A;--coral-dark:#F4502B;
+    --ink:#0B2B29;--read:#1B2B2A;--slate:#5B7270;--bg:#F4FBFA;--card:#FFFFFF;--line:#E2EFED;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Hanken Grotesk',sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%, #E7F6F4 0%, transparent 60%),#EAF2F1;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:32px 16px;color:var(--ink);
+  }
+  .label{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--slate);margin-bottom:14px;font-weight:600;}
+
+  .phone{
+    width:390px;max-width:100%;height:780px;background:#0B2B29;border-radius:46px;padding:12px;
+    box-shadow:0 40px 80px -30px rgba(11,43,41,.55),0 0 0 1px rgba(0,0,0,.04);position:relative;
+  }
+  .screen{position:relative;width:100%;height:100%;background:var(--bg);border-radius:36px;overflow:hidden;display:flex;flex-direction:column;}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:26px;background:#0B2B29;border-radius:0 0 16px 16px;z-index:30;}
+
+  .head{padding:40px 22px 0;}
+  .prog{display:flex;align-items:center;gap:10px;}
+  .back{font-size:20px;color:var(--slate);text-decoration:none;line-height:1;}
+  .bar{flex:1;height:6px;background:#DCEEEB;border-radius:99px;overflow:hidden;}
+  .bar > i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--teal-bright),var(--teal));border-radius:99px;}
+  .pgnum{font-size:11.5px;font-weight:600;color:var(--slate);}
+  .row2{display:flex;align-items:center;justify-content:space-between;margin-top:14px;}
+  .chip{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--teal-deep);}
+  .chip .num{width:22px;height:22px;border-radius:7px;background:var(--teal-bright);color:#04201C;font-family:'Bricolage Grotesque';font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;}
+  .qcount{font-size:11.5px;font-weight:600;color:var(--slate);background:#EAF6F4;padding:5px 11px;border-radius:99px;}
+
+  @keyframes blink{50%{opacity:.2;}}
+
+  /* center stage */
+  .stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 24px 0;gap:18px;}
+
+  /* big camera self-view */
+  .camera{position:relative;width:300px;max-width:88%;height:416px;border-radius:26px;overflow:hidden;
+    background:radial-gradient(120% 80% at 50% 26%,#18514C,#0E3A37 55%,#08231F);
+    box-shadow:0 28px 54px -22px rgba(11,43,41,.6);}
+  .camera .grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:33.33% 33.33%;}
+  .camera .sil{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);opacity:.17;}
+  .camera .vignette{position:absolute;inset:0;box-shadow:inset 0 0 100px 24px rgba(0,0,0,.42);}
+  .camera .rec{position:absolute;top:13px;left:13px;display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.05em;color:#fff;background:rgba(0,0,0,.4);padding:5px 10px;border-radius:99px;}
+  .camera .rec .d{width:7px;height:7px;border-radius:50%;background:#FF4D4D;animation:blink 1s steps(2,start) infinite;}
+  .camera .youtag{position:absolute;bottom:13px;left:14px;font-size:11px;color:rgba(255,255,255,.8);font-weight:600;background:rgba(0,0,0,.32);padding:4px 10px;border-radius:99px;}
+
+  /* small voice indicator */
+  .voicebar{display:flex;align-items:center;gap:13px;}
+  .orb{flex:none;width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#3FD6C7,#0D9488 60%,#0B6F66);box-shadow:0 10px 22px -8px rgba(13,148,136,.6);display:flex;align-items:center;justify-content:center;transition:.3s;}
+  .listening .orb{background:radial-gradient(circle at 35% 30%,#FF9A82,#FF6B4A 60%,#E2451F);box-shadow:0 10px 22px -8px rgba(244,80,43,.55);}
+  .eq{display:flex;align-items:center;gap:3px;height:22px;}
+  .eq span{width:3.5px;border-radius:99px;background:rgba(255,255,255,.92);height:7px;}
+  .speaking .eq span{animation:eq .9s ease-in-out infinite;}
+  .eq span:nth-child(2){animation-delay:.15s;}
+  .eq span:nth-child(3){animation-delay:.3s;}
+  .eq span:nth-child(4){animation-delay:.45s;}
+  .eq span:nth-child(5){animation-delay:.1s;}
+  @keyframes eq{0%,100%{height:7px;}50%{height:20px;}}
+  .mic{display:none;}
+  .listening .eq{display:none;}
+  .listening .mic{display:block;}
+
+  .vtext .state{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--teal-deep);}
+  .vtext .state.lis{color:var(--coral-dark);}
+  .vtext .sub{font-size:12px;color:var(--slate);margin-top:2px;display:flex;align-items:center;gap:6px;}
+  .vtext .yd{display:inline-flex;gap:3px;}
+  .vtext .yd i{width:5px;height:5px;border-radius:50%;background:var(--coral);display:inline-block;animation:yd 1.2s infinite;}
+  .vtext .yd i:nth-child(2){animation-delay:.2s;}
+  .vtext .yd i:nth-child(3){animation-delay:.4s;}
+  @keyframes yd{0%,60%,100%{opacity:.25;}30%{opacity:1;}}
+
+  /* controls */
+  .controls{padding:0 22px 28px;display:flex;align-items:center;justify-content:center;gap:14px;}
+  .cbtn{width:52px;height:52px;border-radius:50%;border:1.5px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--slate);transition:.15s;}
+  .cbtn:hover{border-color:#C9DEDB;}
+  .end{flex:1;max-width:210px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--coral),var(--coral-dark));color:#fff;font-family:'Hanken Grotesk';font-weight:700;font-size:15px;padding:16px;border-radius:16px;box-shadow:0 14px 28px -12px rgba(244,80,43,.6);transition:.15s;}
+  .end:hover{transform:translateY(-2px);}
+
+  .caption{margin-top:24px;font-size:12.5px;color:var(--slate);max-width:390px;text-align:center;line-height:1.5;}
+  .caption b{color:var(--ink);}
+</style>
+</head>
+<body>
+  <div class="label">LEAD · Page 6 of 8 — Adaptive Q&amp;A</div>
+
+  <div class="phone">
+    <div class="screen speaking" id="screen">
+      <div class="notch"></div>
+
+      <div class="head">
+        <div class="prog">
+          <a class="back" href="#">‹</a>
+          <div class="bar"><i></i></div>
+          <div class="pgnum">Step 4 of 4</div>
+        </div>
+        <div class="row2">
+          <div class="chip"><span class="num">3</span> Q&amp;A</div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="camera">
+          <div class="grid"></div>
+          <svg class="sil" width="190" height="220" viewBox="0 0 190 220" fill="#fff">
+            <circle cx="95" cy="66" r="46"/>
+            <path d="M95 120 C40 120 12 168 12 220 L178 220 C178 168 150 120 95 120 Z"/>
+          </svg>
+          <div class="vignette"></div>
+          <div class="rec"><span class="d"></span> REC</div>
+          <div class="youtag">You</div>
+        </div>
+
+        <div class="voicebar">
+          <div class="orb">
+            <div class="eq"><span></span><span></span><span></span><span></span><span></span></div>
+            <svg class="mic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>
+          </div>
+          <div class="vtext">
+            <div class="state" id="state">Interviewer speaking</div>
+            <div class="sub" id="sub">Answer naturally — no wrong answers.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="cbtn" title="Captions">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 11.5a2 2 0 1 0 0 1M14 11.5a2 2 0 1 0 0 1"/></svg>
+        </button>
+        <button class="end">End interview</button>
+        <button class="cbtn" title="Mute mic">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <p class="caption"><b>Page 6 — adaptive Q&amp;A.</b> The student's camera is now the focal point, with a live REC dot for the multimodal evidence trail. The voice-state indicator shrinks to a small orb below: teal equalizer when the interviewer speaks, coral mic + "Hearing you…" on the student's turn. The interviewer's words aren't shown.</p>
+
+<script>
+  var screen=document.getElementById('screen'),state=document.getElementById('state'),
+      sub=document.getElementById('sub');
+
+  function speak(){
+    screen.classList.remove('listening');screen.classList.add('speaking');
+    state.textContent='Interviewer speaking';state.classList.remove('lis');
+    sub.innerHTML='Answer naturally — no wrong answers.';
+    setTimeout(listen, 3400);
+  }
+  function listen(){
+    screen.classList.remove('speaking');screen.classList.add('listening');
+    state.textContent='Your turn — listening';state.classList.add('lis');
+    sub.innerHTML='Hearing you <span class="yd"><i></i><i></i><i></i></span>';
+    setTimeout(speak, 3200);
+  }
+  speak();
+</script>
+</body>
+</html>

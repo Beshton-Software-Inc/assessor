@@ -1,52 +1,69 @@
 import { NextResponse } from "next/server";
-import { ALEX_SYSTEM_PROMPT } from "@/lib/ai/prompt";
+import { ALEX_SYSTEM_PROMPT, ALEX_QA_SYSTEM_PROMPT } from "@/lib/ai/prompt";
 import { serverEnv } from "@/lib/env";
 import { getUser } from "@/lib/auth/getUser";
 import { supabaseServer } from "@/lib/supabase/server";
+import { getActiveLeadRun } from "@/lib/lead/run";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 interface RealtimeBody {
   sessionId?: string;
+  // 'qa' selects the page-6 follow-up persona; default is the original Alex.
+  persona?: "default" | "qa";
 }
 
 /**
  * Mints a short-lived OpenAI Realtime client_secret so the browser can open a
  * WebRTC peer connection directly to OpenAI without ever seeing the API key.
- * The system prompt is bound to the session at mint time.
  *
- * Authenticated callers only. If the body carries a `sessionId` we verify the
- * caller can read that session row (RLS-gated) before minting — otherwise an
- * attacker who knew about a session id could burn OpenAI tokens for it.
+ * Allowed callers: an authenticated user OR an anonymous /lead caller whose
+ * lead cookie owns the requested sessionId. Without a sessionId we still
+ * require a valid identity so a leaked endpoint can't burn OpenAI tokens.
  */
 export async function POST(req: Request) {
+  const body = (await req.json().catch(() => ({}))) as RealtimeBody;
+
   const user = await getUser();
-  if (!user) {
+  const lead = user ? null : await getActiveLeadRun();
+
+  if (!user && !lead) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Body is optional — older clients call this with no payload. If present
-  // and a sessionId is supplied, do the RLS-gated read.
-  const body = (await req.json().catch(() => ({}))) as RealtimeBody;
   if (body.sessionId) {
-    const supa = await supabaseServer();
-    const { data: row } = await supa
-      .from("sessions")
-      .select("id")
-      .eq("id", body.sessionId)
-      .maybeSingle();
-    if (!row) {
-      return NextResponse.json(
-        { error: "Forbidden: session not visible" },
-        { status: 403 },
-      );
+    if (user) {
+      const supa = await supabaseServer();
+      const { data: row } = await supa
+        .from("sessions")
+        .select("id")
+        .eq("id", body.sessionId)
+        .maybeSingle();
+      if (!row) {
+        return NextResponse.json(
+          { error: "Forbidden: session not visible" },
+          { status: 403 },
+        );
+      }
+    } else if (lead) {
+      const owns =
+        lead.presentation_session_id === body.sessionId ||
+        lead.qa_session_id === body.sessionId;
+      if (!owns) {
+        return NextResponse.json(
+          { error: "Forbidden: session not in lead run" },
+          { status: 403 },
+        );
+      }
     }
   }
 
   const apiKey = serverEnv.openaiApiKey();
   const model = serverEnv.openaiModel();
   const voice = serverEnv.openaiVoice();
+  const instructions =
+    body.persona === "qa" ? ALEX_QA_SYSTEM_PROMPT : ALEX_SYSTEM_PROMPT;
 
   const res = await fetch("https://api.openai.com/v1/realtime/client_secrets", {
     method: "POST",
@@ -58,7 +75,7 @@ export async function POST(req: Request) {
       session: {
         type: "realtime",
         model,
-        instructions: ALEX_SYSTEM_PROMPT,
+        instructions,
         output_modalities: ["audio"],
         audio: {
           input: {

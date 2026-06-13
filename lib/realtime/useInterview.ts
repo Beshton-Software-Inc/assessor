@@ -79,16 +79,16 @@ export function useInterview() {
   const start = useCallback(
     async (
       aiAudioEl: HTMLAudioElement,
-      opts?: { sessionId?: string },
+      opts?: { sessionId?: string; persona?: "default" | "qa" },
     ) => {
       aiAudioElRef.current = aiAudioEl;
       setState({ ...initialState, phase: "preparing" });
 
       try {
         // Phase B: sessions are now pre-created by /assessor/start →
-        // /api/sessions/start with a paired enduser. The legacy POST
-        // /api/sessions path returns 400; if we get here without a
-        // pre-created id the user came in by an unsupported route.
+        // /api/sessions/start with a paired enduser. The /lead funnel mints
+        // its own sessions via /api/lead/runs/:id/qa. Either way, we need
+        // a pre-existing session id here.
         if (opts?.sessionId) {
           sessionIdRef.current = opts.sessionId;
         } else {
@@ -97,7 +97,14 @@ export function useInterview() {
           );
         }
 
-        const tokenRes = await fetch("/api/realtime/session", { method: "POST" });
+        const tokenRes = await fetch("/api/realtime/session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sessionId: opts.sessionId,
+            persona: opts.persona ?? "default",
+          }),
+        });
         if (!tokenRes.ok) throw new Error("Could not authorize voice session");
         const token = (await tokenRes.json()) as RealtimeTokenResponse;
 

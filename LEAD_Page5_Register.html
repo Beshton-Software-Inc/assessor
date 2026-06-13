@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEAD — Page 5: Register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal:#0D9488;--teal-bright:#14B8A6;--teal-deep:#0F766E;
+    --coral:#FF6B4A;--coral-dark:#F4502B;
+    --ink:#0B2B29;--slate:#5B7270;--bg:#F4FBFA;--card:#FFFFFF;--line:#E2EFED;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Hanken Grotesk',sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%, #E7F6F4 0%, transparent 60%),#EAF2F1;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:32px 16px;color:var(--ink);
+  }
+  .label{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--slate);margin-bottom:14px;font-weight:600;}
+
+  .phone{
+    width:390px;max-width:100%;height:780px;background:#0B2B29;border-radius:46px;padding:12px;
+    box-shadow:0 40px 80px -30px rgba(11,43,41,.55),0 0 0 1px rgba(0,0,0,.04);position:relative;
+  }
+  .screen{position:relative;width:100%;height:100%;background:var(--bg);border-radius:36px;overflow:hidden;display:flex;flex-direction:column;}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:26px;background:#0B2B29;border-radius:0 0 16px 16px;z-index:30;}
+
+  .head{padding:40px 22px 0;}
+
+  /* upload banner */
+  .upload{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:12px 14px;box-shadow:0 8px 22px -16px rgba(13,148,136,.5);}
+  .spin{flex:none;width:30px;height:30px;border-radius:50%;border:3px solid #DCEEEB;border-top-color:var(--teal);animation:spin 1s linear infinite;}
+  .upload.done .spin{border:none;background:var(--teal);position:relative;animation:none;}
+  .upload.done .spin::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .upl-tx{flex:1;}
+  .upl-tx b{font-size:13px;font-weight:700;color:var(--ink);display:block;}
+  .upl-tx .ubar{height:5px;background:#E7F1EF;border-radius:99px;overflow:hidden;margin-top:6px;}
+  .upl-tx .ubar > i{display:block;height:100%;width:8%;background:linear-gradient(90deg,var(--teal-bright),var(--teal));border-radius:99px;transition:width .25s;}
+  .upl-tx small{font-size:11px;color:var(--slate);}
+
+  .body{flex:1;overflow-y:auto;padding:18px 22px 8px;}
+  .body::-webkit-scrollbar{display:none;}
+
+  h1{font-family:'Bricolage Grotesque';font-weight:800;font-size:26px;line-height:1.08;letter-spacing:-.02em;margin-bottom:5px;}
+  .sub{font-size:13.5px;color:var(--slate);line-height:1.45;margin-bottom:18px;font-weight:500;}
+
+  .social{display:flex;flex-direction:column;gap:9px;margin-bottom:16px;}
+  .sbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;border:1.5px solid var(--line);background:#fff;border-radius:13px;padding:14px;font-family:'Hanken Grotesk';font-weight:700;font-size:14px;color:var(--ink);cursor:pointer;transition:.15s;}
+  .sbtn:hover{transform:translateY(-1px);}
+  .sbtn.apple{background:#0B2B29;color:#fff;border-color:#0B2B29;}
+  .sbtn.email{background:linear-gradient(135deg,var(--coral),var(--coral-dark));color:#fff;border-color:transparent;box-shadow:0 14px 26px -14px rgba(244,80,43,.6);}
+  .sbtn.google{background:#4285F4;color:#fff;border-color:#4285F4;}
+  .sbtn.google .gtile{display:flex;align-items:center;justify-content:center;background:#fff;border-radius:6px;padding:3px;}
+  .divider{display:flex;align-items:center;gap:10px;margin:4px 0 16px;color:var(--slate);font-size:11.5px;font-weight:600;}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  .field{margin-bottom:12px;}
+  .field label{font-size:12px;font-weight:600;color:var(--slate);margin-bottom:6px;display:block;}
+  .field input,.field select{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px;font-family:'Hanken Grotesk';font-size:14px;color:var(--ink);outline:none;background:#fff;}
+  .field input:focus,.field select:focus{border-color:var(--teal-bright);}
+  .two{display:flex;gap:10px;}
+  .two .field{flex:1;}
+
+  .optin{display:flex;gap:10px;align-items:flex-start;background:#EAF6F4;border-radius:13px;padding:12px;margin:6px 0 4px;cursor:pointer;}
+  .optin .cb{flex:none;width:22px;height:22px;border-radius:7px;border:2px solid #B7D8D3;background:#fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:800;transition:.15s;}
+  .optin.on .cb{background:var(--teal);border-color:var(--teal);}
+  .optin .ot{font-size:12px;color:var(--slate);line-height:1.4;}
+  .optin .ot b{color:var(--ink);font-weight:700;}
+
+  .foot{padding:12px 22px 26px;background:linear-gradient(to top,var(--bg) 70%,transparent);}
+  .cta{width:100%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--coral),var(--coral-dark));color:#fff;font-family:'Hanken Grotesk';font-weight:700;font-size:16px;padding:17px;border-radius:17px;box-shadow:0 16px 30px -12px rgba(244,80,43,.65);transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .cta:hover{transform:translateY(-2px);}
+  .footnote{text-align:center;font-size:11px;color:var(--slate);margin-top:10px;}
+
+  .caption{margin-top:24px;font-size:12.5px;color:var(--slate);max-width:390px;text-align:center;line-height:1.5;}
+  .caption b{color:var(--ink);}
+</style>
+</head>
+<body>
+  <div class="label">LEAD · Page 5 of 8 — Get Your Results</div>
+
+  <div class="phone">
+    <div class="screen">
+      <div class="notch"></div>
+
+      <div class="head">
+        <div class="upload" id="upload">
+          <div class="spin"></div>
+          <div class="upl-tx">
+            <b id="ulabel">Uploading your presentation…</b>
+            <div class="ubar"><i id="ubar"></i></div>
+            <small id="usmall">Keep this open — it runs in the background.</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="body">
+        <h1>Get your results</h1>
+        <p class="sub">Create a free account so your report is waiting for you — and you can pick up where you left off.</p>
+
+        <div class="two">
+          <div class="field"><label>First name</label><input type="text" placeholder="Anna"></div>
+          <div class="field"><label>Grade</label>
+            <select><option>11th</option><option>9th</option><option>10th</option><option>12th</option></select>
+          </div>
+        </div>
+
+        <div class="social">
+          <button class="sbtn google">
+            <span class="gtile"><svg width="16" height="16" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22 22-9.8 22-22c0-1.5-.2-2.6-.4-3.5z"/><path fill="#FF3D00" d="M4.3 14.7l6.6 4.8C12.7 16 17.9 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 4.1 29.6 2 24 2 15.5 2 8.1 6.8 4.3 14.7z"/><path fill="#4CAF50" d="M24 46c5.5 0 10.4-2.1 14.1-5.5l-6.5-5.5c-2 1.5-4.7 2.5-7.6 2.5-5.2 0-9.6-3.3-11.2-8l-6.5 5C7.9 41.1 15.3 46 24 46z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.5l6.5 5.5C40.9 36.3 46 31 46 24c0-1.5-.2-2.6-.4-3.5z"/></svg></span>
+            Sign in with Google
+          </button>
+          <button class="sbtn apple">
+            <svg width="15" height="17" viewBox="0 0 384 512" fill="#fff"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+            Sign in with Apple
+          </button>
+          <button class="sbtn email">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            Use Email to sign in
+          </button>
+        </div>
+
+        <div class="optin on" id="optin" onclick="this.classList.toggle('on')">
+          <div class="cb">✓</div>
+          <div class="ot"><b>Share my results with vetted college advisers</b> for free guidance. Optional — change anytime.</div>
+        </div>
+      </div>
+
+      <div class="foot">
+        <div class="footnote">Email sign-in uses a magic link — no password. By continuing you agree to the Terms &amp; Privacy Policy.</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="caption"><b>Page 5 — register.</b> The strategic gate: the presentation uploads in the background (top banner) while the student signs up, so the wait feels productive. Name + grade first, then a sign-in method (Google / Apple / Email magic-link). The adviser-sharing opt-in is checked by default — flag this, since opt-out has different consent implications than the "private by choice" framing.</p>
+
+<script>
+  // animate upload to completion
+  var p=8,ubar=document.getElementById('ubar'),upl=document.getElementById('upload'),
+      ulabel=document.getElementById('ulabel'),usmall=document.getElementById('usmall');
+  var iv=setInterval(function(){
+    p+=Math.random()*14+6;
+    if(p>=100){p=100;clearInterval(iv);
+      upl.classList.add('done');ulabel.textContent='Presentation uploaded';
+      usmall.textContent='Saved — finish signing up below.';}
+    ubar.style.width=p+'%';
+  },550);
+</script>
+</body>
+</html>

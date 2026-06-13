@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { serverEnv } from "@/lib/env";
 import { supabaseAdmin, supabaseServer } from "@/lib/supabase/server";
-import { getUser } from "@/lib/auth/getUser";
+import { authorizeSessionAccess } from "@/lib/lead/access";
 import type { UploadUrlResponse } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -12,35 +12,22 @@ export const dynamic = "force-dynamic";
  * directly to Supabase Storage. Avoids Vercel's request-body size cap and
  * keeps the service role key server-only.
  *
- * Auth flow: (1) require a valid session, (2) RLS-check the session row is
- * visible to this caller via supabaseServer(), then (3) drop to the
- * service-role client to mint the Storage signed URL — Storage signing
- * needs the service role key, but the access decision was already made by
- * RLS. The follow-up UPDATE that flips stage to 'recording' goes back
- * through supabaseServer() so the sessions_update policy gates it.
+ * Auth: either an authenticated user with RLS visibility on the session,
+ * or an anonymous /lead caller whose lead cookie owns the session.
+ * Storage signing always uses the service role; the access decision is
+ * already made by authorizeSessionAccess(). The follow-up sessions UPDATE
+ * goes through supabaseServer() for the user path so RLS gates it, and
+ * through the admin client for the lead path (no JWT to drive RLS).
  */
 export async function POST(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const user = await getUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { id } = await params;
 
-  const serverSupa = await supabaseServer();
-  const { data: row } = await serverSupa
-    .from("sessions")
-    .select("id")
-    .eq("id", id)
-    .maybeSingle();
-  if (!row) {
-    return NextResponse.json(
-      { error: "Forbidden: session not visible" },
-      { status: 403 },
-    );
+  const access = await authorizeSessionAccess(id);
+  if (!access.ok) {
+    return NextResponse.json({ error: access.reason }, { status: access.status });
   }
 
   const bucket = serverEnv.recordingsBucket();
@@ -58,12 +45,16 @@ export async function POST(
     );
   }
 
-  // Track the eventual storage path on the session row up front so an aborted
-  // upload still leaves a useful audit trail. Routed via supabaseServer() so
-  // the sessions_update RLS policy gates it (assessor-on-non-revoked or
-  // app_admin only).
-  const { error: updateError } = await serverSupa
-    .from("sessions")
+  // Mark the row 'recording' and persist the eventual storage path. Routed
+  // through supabaseServer() for the user path so the sessions_update RLS
+  // policy gates it; through the admin client for the lead path because
+  // lead callers don't carry an RLS-capable JWT.
+  const updater =
+    access.via === "user"
+      ? (await supabaseServer()).from("sessions")
+      : admin.from("sessions");
+
+  const { error: updateError } = await updater
     .update({ stage: "recording", recording_path: path })
     .eq("id", id);
 

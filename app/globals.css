@@ -41,3 +41,105 @@ body {
 .pulse-ring {
   animation: pulse-ring 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/*
+ * LEAD design tokens & shared bits.
+ *
+ * Scoped to .lead-root so we don't leak the teal/coral palette into the
+ * dark-themed assessor surfaces. The :root `--background`/`--foreground`
+ * vars above stay in charge everywhere outside /lead.
+ */
+.lead-root {
+  --teal: #0d9488;
+  --teal-bright: #14b8a6;
+  --teal-deep: #0f766e;
+  --coral: #ff6b4a;
+  --coral-dark: #f4502b;
+  --rec: #ff4d4d;
+  --ink: #0b2b29;
+  --read: #1b2b2a;
+  --slate: #5b7270;
+  --bg: #f4fbfa;
+  --card: #ffffff;
+  --line: #e2efed;
+
+  font-family: var(--font-hanken), "Hanken Grotesk", ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", Roboto, sans-serif;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #e7f6f4 0%, transparent 60%),
+    #eaf2f1;
+  min-height: 100dvh;
+  color: var(--ink);
+}
+
+.lead-display {
+  font-family: var(--font-bricolage), "Bricolage Grotesque",
+    "Hanken Grotesk", sans-serif;
+}
+
+.lead-root .lead-cta {
+  background: linear-gradient(135deg, var(--coral), var(--coral-dark));
+  color: #fff;
+  font-weight: 700;
+  border-radius: 17px;
+  padding: 17px;
+  box-shadow: 0 16px 30px -12px rgba(244, 80, 43, 0.65);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.lead-root .lead-cta:hover {
+  transform: translateY(-2px);
+}
+.lead-root .lead-cta:disabled {
+  opacity: 0.6;
+  transform: none;
+  cursor: not-allowed;
+}
+
+@keyframes lead-blink {
+  50% {
+    opacity: 0.2;
+  }
+}
+.lead-blink {
+  animation: lead-blink 1s steps(2, start) infinite;
+}
+
+@keyframes lead-eq {
+  0%,
+  100% {
+    height: 7px;
+  }
+  50% {
+    height: 20px;
+  }
+}
+.lead-eq-bar {
+  animation: lead-eq 0.9s ease-in-out infinite;
+}
+
+@keyframes lead-yd {
+  0%,
+  60%,
+  100% {
+    opacity: 0.25;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+.lead-yd-dot {
+  animation: lead-yd 1.2s infinite;
+}
+
+@keyframes lead-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.lead-spin {
+  animation: lead-spin 1s linear infinite;
+}

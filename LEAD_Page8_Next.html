@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEAD — Page 8: What's Next</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal:#0D9488;--teal-bright:#14B8A6;--teal-deep:#0F766E;
+    --coral:#FF6B4A;--coral-dark:#F4502B;
+    --ink:#0B2B29;--read:#1B2B2A;--slate:#5B7270;--bg:#F4FBFA;--card:#FFFFFF;--line:#E2EFED;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Hanken Grotesk',sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%, #E7F6F4 0%, transparent 60%),#EAF2F1;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:32px 16px;color:var(--ink);
+  }
+  .label{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--slate);margin-bottom:14px;font-weight:600;}
+
+  .phone{
+    width:390px;max-width:100%;height:780px;background:#0B2B29;border-radius:46px;padding:12px;
+    box-shadow:0 40px 80px -30px rgba(11,43,41,.55),0 0 0 1px rgba(0,0,0,.04);position:relative;
+  }
+  .screen{position:relative;width:100%;height:100%;background:var(--bg);border-radius:36px;overflow:hidden;display:flex;flex-direction:column;}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:26px;background:#0B2B29;border-radius:0 0 16px 16px;z-index:30;}
+  .blob{position:absolute;border-radius:50%;filter:blur(8px);z-index:0;}
+  .blob1{width:200px;height:200px;background:radial-gradient(circle,#9DECE4,transparent 70%);top:-50px;right:-60px;opacity:.5;}
+  .blob2{width:170px;height:170px;background:radial-gradient(circle,#FFD2C4,transparent 70%);top:60px;left:-70px;opacity:.5;}
+
+  .body{position:relative;z-index:5;flex:1;overflow-y:auto;padding:28px 22px 16px;}
+  .body::-webkit-scrollbar{display:none;}
+
+  h1{font-family:'Bricolage Grotesque';font-weight:800;font-size:27px;line-height:1.05;letter-spacing:-.02em;margin-bottom:4px;}
+  .sub{font-size:13.5px;color:var(--slate);line-height:1.4;font-weight:500;margin-bottom:13px;}
+
+  /* adviser hero */
+  .adviser{background:linear-gradient(140deg,#14B8A6,#0F766E 60%,#0B2B29);border-radius:20px;padding:15px;color:#fff;box-shadow:0 20px 40px -18px rgba(15,118,110,.7);margin-bottom:10px;}
+  .adviser .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:rgba(255,255,255,.2);padding:4px 10px;border-radius:99px;margin-bottom:9px;}
+  .adviser h2{font-family:'Bricolage Grotesque';font-weight:800;font-size:18px;line-height:1.15;margin-bottom:5px;}
+  .adviser p{font-size:12.5px;line-height:1.4;color:rgba(255,255,255,.88);margin-bottom:12px;}
+  .adviser .abtn{width:100%;border:none;cursor:pointer;background:#fff;color:var(--teal-deep);font-family:'Hanken Grotesk';font-weight:700;font-size:15px;padding:13px;border-radius:14px;transition:.15s;}
+  .adviser .abtn:hover{transform:translateY(-2px);}
+
+  /* card */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:13px;margin-bottom:9px;box-shadow:0 10px 24px -18px rgba(13,148,136,.5);}
+  .card .ch{display:flex;align-items:center;gap:11px;margin-bottom:9px;}
+  .card .ch .ci{width:36px;height:36px;border-radius:11px;background:#EAF6F4;display:flex;align-items:center;justify-content:center;font-size:18px;}
+  .card .ch b{font-family:'Bricolage Grotesque';font-weight:800;font-size:16px;color:var(--ink);}
+  .card .ch small{display:block;font-size:11.5px;color:var(--slate);font-weight:500;margin-top:1px;}
+
+  .goal{display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--line);}
+  .goal:first-of-type{border-top:none;}
+  .goal .ge{font-size:15px;}
+  .goal .gt{flex:1;font-size:13px;font-weight:600;color:var(--ink);}
+  .goal .gtag{font-size:10px;font-weight:700;color:var(--teal-deep);background:#EAF6F4;padding:3px 8px;border-radius:99px;}
+  .link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:13px;font-weight:700;color:var(--coral-dark);text-decoration:none;}
+
+  .sharebtn{width:100%;border:1.5px solid var(--teal);background:#fff;color:var(--teal-deep);cursor:pointer;font-family:'Hanken Grotesk';font-weight:700;font-size:14px;padding:12px;border-radius:13px;transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .sharebtn:hover{background:#EAF6F4;}
+
+  .home{display:block;text-align:center;margin-top:4px;font-size:13px;color:var(--slate);font-weight:600;text-decoration:none;padding:8px;}
+
+  .caption{margin-top:24px;font-size:12.5px;color:var(--slate);max-width:390px;text-align:center;line-height:1.5;}
+  .caption b{color:var(--ink);}
+</style>
+</head>
+<body>
+  <div class="label">LEAD · Page 8 of 8 — What's Next</div>
+
+  <div class="phone">
+    <div class="screen">
+      <div class="notch"></div>
+      <div class="blob blob1"></div>
+      <div class="blob blob2"></div>
+
+      <div class="body">
+        <h1>You're all set, Anna 🎉</h1>
+        <p class="sub">Here's how to keep building toward a 5.</p>
+
+        <div class="adviser">
+          <span class="tag">Free · 30 min · 1-on-1</span>
+          <h2>A free 30-min session with a college adviser</h2>
+          <p>A vetted adviser walks you through your plan one-on-one — no pressure.</p>
+          <button class="abtn">Book my free 30-min session →</button>
+        </div>
+
+        <div class="card">
+          <div class="ch">
+            <div class="ci">🎯</div>
+            <div><b>Your growth plan</b><small>4 goals to move you toward a 5</small></div>
+          </div>
+          <div class="goal"><span class="ge">🧠</span><span class="gt">Stress-test your own arguments</span><span class="gtag">Critical Thinking</span></div>
+          <div class="goal"><span class="ge">🗣️</span><span class="gt">Swap fillers for pauses</span><span class="gtag">Communication</span></div>
+          <div class="goal"><span class="ge">🧭</span><span class="gt">Lead with a bolder vision</span><span class="gtag">Leadership</span></div>
+          <div class="goal"><span class="ge">🎓</span><span class="gt">Write a vulnerable, honest story</span><span class="gtag">Reflection</span></div>
+          <a class="link" href="#">View full plan with steps &amp; deadlines →</a>
+        </div>
+
+        <div class="card">
+          <div class="ch">
+            <div class="ci">💬</div>
+            <div><b>Know someone applying?</b><small>Share LEAD — it's free for them too.</small></div>
+          </div>
+          <button class="sharebtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+            Share my link
+          </button>
+        </div>
+
+        <a class="home" href="#">Back to my dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <p class="caption"><b>Page 8 — what's next.</b> Turns completion into action. The adviser session is the B2C2B conversion, framed as genuine help ("free, no pressure") and tied to the student's opt-in. The growth plan preview keeps the coaching promise, and the share card quietly drives referrals — more students, more data.</p>
+</body>
+</html>
