@@ -56,12 +56,13 @@ export default function LeadWatchPage() {
       />
 
       <div
-        className="flex-1 overflow-y-auto px-[22px] pb-32 pt-3.5"
+        className="flex-1 overflow-y-auto px-[22px] pb-32 pt-3.5 lg:overflow-visible lg:px-10 lg:pb-12 lg:pt-8"
         style={{ scrollbarWidth: "none" }}
       >
+        <div className="lg:grid lg:grid-cols-[1.3fr_1fr] lg:gap-12">
         {/* Video player (simulated, matches mockup) */}
         <div
-          className={`relative mb-4 h-[208px] overflow-hidden rounded-[18px] shadow-[0_18px_38px_-20px_rgba(13,148,136,0.7)] ${
+          className={`relative mb-4 h-[208px] overflow-hidden rounded-[18px] shadow-[0_18px_38px_-20px_rgba(13,148,136,0.7)] lg:mb-0 lg:h-[420px] ${
             playing ? "is-playing" : ""
           }`}
           style={{
@@ -144,7 +145,8 @@ export default function LeadWatchPage() {
           </div>
         </div>
 
-        <h2 className="lead-display mb-3.5 text-[21px] font-extrabold leading-[1.18] tracking-[-0.01em]">
+        <div>
+        <h2 className="lead-display mb-3.5 text-[21px] font-extrabold leading-[1.18] tracking-[-0.01em] lg:text-[28px]">
           Is changing words online clever — or just wrong?
         </h2>
 
@@ -160,16 +162,32 @@ export default function LeadWatchPage() {
         />
 
         <div
-          className="mt-3 rounded-[13px] p-3 text-[12.5px] font-semibold leading-[1.45] text-[var(--teal-deep)]"
+          className="mt-3 rounded-[13px] p-3 text-[12.5px] font-semibold leading-[1.45] text-[var(--teal-deep)] lg:text-[14px]"
           style={{ background: "#EAF6F4" }}
         >
           <b className="text-[var(--ink)]">In your talk:</b> where do you stand?
           Weigh all three, and back it up with an example.
         </div>
+
+        {/* Desktop CTA */}
+        <div className="mt-6 hidden lg:block">
+          <Link
+            href={"/lead/record" as Route}
+            className="lead-cta w-full text-[16px]"
+          >
+            I&apos;m ready to present <span>→</span>
+          </Link>
+          <div className="mt-2 text-center text-[12px] text-[var(--slate)]">
+            Take a moment to gather your thoughts
+          </div>
+        </div>
+        </div>
+        </div>
       </div>
 
+      {/* Phone-frame floating CTA */}
       <div
-        className="absolute inset-x-0 bottom-0 z-20 px-[22px] pb-7 pt-3.5"
+        className="absolute inset-x-0 bottom-0 z-20 px-[22px] pb-7 pt-3.5 lg:hidden"
         style={{
           background: "linear-gradient(to top,var(--bg) 62%,transparent)",
         }}

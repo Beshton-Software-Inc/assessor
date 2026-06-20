@@ -26,7 +26,9 @@ function RegisterInner() {
   const [shareWithAdvisers, setShareWithAdvisers] = useState(false);
   const [emailOpen, setEmailOpen] = useState(false);
   const [email, setEmail] = useState("");
-  const [magicSent, setMagicSent] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Hydrate from existing run state when a user comes back to this page.
@@ -70,11 +72,11 @@ function RegisterInner() {
   async function signInOAuth(provider: "google" | "apple") {
     if (!(await persistProfile())) return;
     const supa = supabaseBrowser();
-    const callback = new URL(
-      "/auth/callback",
-      window.location.origin,
-    );
-    callback.searchParams.set("next", NEXT_PATH);
+    // Land back on /lead/register; the effect above will see the user is
+    // signed in, claim the lead run, and advance to /lead/qa with the
+    // recorder/cookie state still intact in this tab.
+    const callback = new URL("/auth/callback", window.location.origin);
+    callback.searchParams.set("next", "/lead/register");
     const { error: e } = await supa.auth.signInWithOAuth({
       provider,
       options: { redirectTo: callback.toString() },
@@ -82,24 +84,49 @@ function RegisterInner() {
     if (e) setError(e.message);
   }
 
-  async function signInMagic(e: FormEvent<HTMLFormElement>) {
+  async function sendOtp(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!(await persistProfile())) return;
+    setSubmitting(true);
     const supa = supabaseBrowser();
-    const callback = new URL(
-      "/auth/callback",
-      window.location.origin,
-    );
-    callback.searchParams.set("next", NEXT_PATH);
-    const { error: err } = await supa.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: callback.toString() },
-    });
+    // Omit emailRedirectTo so Supabase prompts the user to type the
+    // 6-digit code from the email back into this same tab — keeps the
+    // recorder + lead-run state alive instead of bouncing to a fresh tab
+    // that has no cookie / no media gesture.
+    const { error: err } = await supa.auth.signInWithOtp({ email });
+    setSubmitting(false);
     if (err) {
       setError(err.message);
       return;
     }
-    setMagicSent(true);
+    setError(null);
+    setOtpSent(true);
+  }
+
+  async function verifyOtp(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    const supa = supabaseBrowser();
+    const code = otp.replace(/\D/g, "");
+    const { error: vErr } = await supa.auth.verifyOtp({
+      email,
+      token: code,
+      type: "email",
+    });
+    if (vErr) {
+      setSubmitting(false);
+      setError(vErr.message);
+      return;
+    }
+    const r = await ensureRun();
+    const res = await fetch(`/api/lead/runs/${r.id}/claim`, { method: "POST" });
+    setSubmitting(false);
+    if (!res.ok) {
+      setError("Signed in, but couldn't link your session. Please refresh.");
+      return;
+    }
+    router.replace(NEXT_PATH as Route);
   }
 
   const recPhase = recorder.state.phase;
@@ -109,9 +136,9 @@ function RegisterInner() {
 
   return (
     <PhoneFrame>
-      <div className="px-[22px] pt-10">
+      <div className="px-[22px] pt-10 lg:px-10 lg:pt-8">
         <div
-          className={`flex items-center gap-3 rounded-[15px] border border-[var(--line)] bg-[var(--card)] p-3 shadow-[0_8px_22px_-16px_rgba(13,148,136,0.5)]`}
+          className={`mx-auto flex items-center gap-3 rounded-[15px] border border-[var(--line)] bg-[var(--card)] p-3 shadow-[0_8px_22px_-16px_rgba(13,148,136,0.5)] lg:max-w-3xl lg:p-4`}
         >
           {uploadDone ? (
             <div
@@ -154,13 +181,14 @@ function RegisterInner() {
       </div>
 
       <div
-        className="flex-1 overflow-y-auto px-[22px] pb-2 pt-4"
+        className="flex-1 overflow-y-auto px-[22px] pb-2 pt-4 lg:overflow-visible lg:px-10 lg:pb-12 lg:pt-8"
         style={{ scrollbarWidth: "none" }}
       >
-        <h1 className="lead-display mb-1 text-[26px] font-extrabold leading-[1.08] tracking-[-0.02em]">
+        <div className="mx-auto lg:max-w-3xl">
+        <h1 className="lead-display mb-1 text-[26px] font-extrabold leading-[1.08] tracking-[-0.02em] lg:text-[36px]">
           Get your results
         </h1>
-        <p className="mb-4 text-[13.5px] font-medium leading-[1.45] text-[var(--slate)]">
+        <p className="mb-4 text-[13.5px] font-medium leading-[1.45] text-[var(--slate)] lg:mb-6 lg:text-[15px]">
           Create a free account so your report is waiting for you — and you can
           pick up where you left off.
         </p>
@@ -241,8 +269,8 @@ function RegisterInner() {
           </button>
         </div>
 
-        {emailOpen && (
-          <form onSubmit={signInMagic} className="mb-4 flex flex-col gap-2">
+        {emailOpen && !otpSent && (
+          <form onSubmit={sendOtp} className="mb-4 flex flex-col gap-2">
             <input
               type="email"
               required
@@ -251,15 +279,53 @@ function RegisterInner() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-xl border-[1.5px] border-[var(--line)] bg-white px-3 py-3 text-[14px] outline-none focus:border-[var(--teal-bright)]"
             />
-            <button type="submit" className="lead-cta w-full text-[15px]">
-              {magicSent ? "Check your inbox" : "Send magic link"}
+            <button
+              type="submit"
+              disabled={submitting}
+              className="lead-cta w-full text-[15px] disabled:opacity-60"
+            >
+              {submitting ? "Sending…" : "Send code"}
             </button>
-            {magicSent && (
-              <p className="text-[12px] text-[var(--slate)]">
-                We emailed a sign-in link to{" "}
-                <strong className="text-[var(--ink)]">{email}</strong>.
-              </p>
-            )}
+          </form>
+        )}
+
+        {emailOpen && otpSent && (
+          <form onSubmit={verifyOtp} className="mb-4 flex flex-col gap-2">
+            <p className="text-[12px] text-[var(--slate)]">
+              We emailed a 6-digit code to{" "}
+              <strong className="text-[var(--ink)]">{email}</strong>. Enter it
+              here to finish signing in.
+            </p>
+            <input
+              type="text"
+              required
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              pattern="[0-9]*"
+              maxLength={6}
+              placeholder="123456"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+              className="w-full rounded-xl border-[1.5px] border-[var(--line)] bg-white px-3 py-3 text-center text-[18px] tracking-[0.4em] outline-none focus:border-[var(--teal-bright)]"
+            />
+            <button
+              type="submit"
+              disabled={submitting || otp.length < 6}
+              className="lead-cta w-full text-[15px] disabled:opacity-60"
+            >
+              {submitting ? "Verifying…" : "Verify and continue"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setOtpSent(false);
+                setOtp("");
+                setError(null);
+              }}
+              className="text-[12px] text-[var(--slate)] underline-offset-2 hover:text-[var(--teal-deep)] hover:underline"
+            >
+              Use a different email
+            </button>
           </form>
         )}
 
@@ -291,10 +357,11 @@ function RegisterInner() {
             {error}
           </p>
         )}
+        </div>
       </div>
 
       <div
-        className="px-[22px] pb-7 pt-3"
+        className="px-[22px] pb-7 pt-3 lg:px-10 lg:pb-10"
         style={{
           background: "linear-gradient(to top,var(--bg) 70%,transparent)",
         }}

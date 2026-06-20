@@ -15,8 +15,8 @@ const FILL_PCT = { 1: "25%", 2: "50%", 3: "75%", 4: "100%" } as const;
 
 export function ProgressHeader({ step, back, right, stage }: Props) {
   return (
-    <div className="relative z-10 px-[22px] pt-10">
-      <div className="flex items-center gap-2.5">
+    <div className="relative z-10 px-[22px] pt-10 lg:px-10 lg:pt-8">
+      <div className="flex items-center gap-2.5 lg:gap-4">
         {back ? (
           <Link
             href={back as Route}

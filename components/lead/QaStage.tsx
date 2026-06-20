@@ -23,7 +23,7 @@ export function QaStage({ interview }: Props) {
     interview.state.phase === "live" || interview.state.phase === "uploading";
 
   return (
-    <div className="relative h-[416px] w-[300px] max-w-[88%] overflow-hidden rounded-[26px] shadow-[0_28px_54px_-22px_rgba(11,43,41,0.6)]">
+    <div className="relative h-[416px] w-[300px] max-w-[88%] overflow-hidden rounded-[26px] shadow-[0_28px_54px_-22px_rgba(11,43,41,0.6)] lg:h-[520px] lg:w-[640px] lg:max-w-full">
       <video
         ref={videoRef}
         muted

@@ -72,56 +72,60 @@ export default function LeadRecordPage() {
         }
       />
 
-      <RecorderStage recorder={recorder} />
+      <div className="flex flex-1 flex-col lg:grid lg:flex-none lg:grid-cols-[1.2fr_1fr] lg:gap-12 lg:px-10 lg:pt-6">
+        <RecorderStage recorder={recorder} />
 
-      <div className="flex-1 px-[22px] pt-4">
-        <div className="lead-display mb-1 text-[16px] font-extrabold tracking-[-0.01em] text-[var(--ink)]">
-          Keep these in mind
-        </div>
-        <div className="mb-3 text-[12px] font-semibold text-[var(--teal-deep)]">
-          Where do you stand? · Weigh the 3 views · Give examples
-        </div>
+        <div className="flex flex-1 flex-col">
+          <div className="px-[22px] pt-4 lg:px-0 lg:pt-0">
+            <div className="lead-display mb-1 text-[16px] font-extrabold tracking-[-0.01em] text-[var(--ink)] lg:text-[20px]">
+              Keep these in mind
+            </div>
+            <div className="mb-3 text-[12px] font-semibold text-[var(--teal-deep)] lg:text-[13.5px]">
+              Where do you stand? · Weigh the 3 views · Give examples
+            </div>
 
-        <Tip
-          n={1}
-          title="Creativity over rules"
-          desc="online reinvention is positive; embrace it."
-        />
-        <Tip
-          n={2}
-          title="Clarity matters"
-          desc="shared standards keep communication clear."
-        />
-        <Tip
-          n={3}
-          title="Who does it serve?"
-          desc="judge changes by who they include or leave behind."
-        />
-      </div>
-
-      <div className="px-[22px] pb-7 pt-3.5">
-        <button
-          type="button"
-          onClick={onDone}
-          disabled={recorder.state.phase !== "recording"}
-          className="lead-cta w-full text-[16px]"
-        >
-          {recorder.state.phase === "preparing" && "Getting camera ready…"}
-          {recorder.state.phase === "recording" && (
-            <>
-              I&apos;m done with my presentation <span>→</span>
-            </>
-          )}
-          {recorder.state.phase === "uploading" && "Uploading…"}
-          {recorder.state.phase === "error" && "Camera error"}
-        </button>
-        {recorder.state.phase === "error" && (
-          <div className="mt-2 text-center text-[11px] text-red-600">
-            {recorder.state.error}
+            <Tip
+              n={1}
+              title="Creativity over rules"
+              desc="online reinvention is positive; embrace it."
+            />
+            <Tip
+              n={2}
+              title="Clarity matters"
+              desc="shared standards keep communication clear."
+            />
+            <Tip
+              n={3}
+              title="Who does it serve?"
+              desc="judge changes by who they include or leave behind."
+            />
           </div>
-        )}
-        <div className="mt-2.5 text-center text-[11px] text-[var(--slate)]">
-          Take your time · ≈ 3–5 minutes
+
+          <div className="mt-auto px-[22px] pb-7 pt-3.5 lg:px-0 lg:pt-6">
+            <button
+              type="button"
+              onClick={onDone}
+              disabled={recorder.state.phase !== "recording"}
+              className="lead-cta w-full text-[16px]"
+            >
+              {recorder.state.phase === "preparing" && "Getting camera ready…"}
+              {recorder.state.phase === "recording" && (
+                <>
+                  I&apos;m done with my presentation <span>→</span>
+                </>
+              )}
+              {recorder.state.phase === "uploading" && "Uploading…"}
+              {recorder.state.phase === "error" && "Camera error"}
+            </button>
+            {recorder.state.phase === "error" && (
+              <div className="mt-2 text-center text-[11px] text-red-600">
+                {recorder.state.error}
+              </div>
+            )}
+            <div className="mt-2.5 text-center text-[11px] text-[var(--slate)] lg:text-[12px]">
+              Take your time · ≈ 3–5 minutes
+            </div>
+          </div>
         </div>
       </div>
     </PhoneFrame>

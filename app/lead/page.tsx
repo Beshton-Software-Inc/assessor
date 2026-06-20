@@ -34,8 +34,8 @@ export default function LeadLandingPage() {
         }}
       />
 
-      {/* top bar */}
-      <div className="relative z-10 flex items-center justify-between px-[26px] pt-10">
+      {/* top bar (phone-frame only — desktop has its own header) */}
+      <div className="relative z-10 flex items-center justify-between px-[26px] pt-10 lg:hidden">
         <div className="flex items-center gap-2.5">
           <div
             className="lead-display flex h-[30px] w-[30px] items-center justify-center rounded-[9px] text-[17px] font-extrabold text-white shadow-[0_6px_14px_-4px_rgba(13,148,136,0.6)]"
@@ -59,30 +59,58 @@ export default function LeadLandingPage() {
       </div>
 
       {/* hero */}
-      <div className="relative z-10 flex flex-1 flex-col px-[26px] pt-[18px]">
-        <div className="mb-5 inline-flex items-center gap-2 text-[12.5px] font-semibold text-[var(--teal-deep)]">
-          <span
-            className="h-[7px] w-[7px] rounded-full"
-            style={{
-              background: "var(--coral)",
-              boxShadow: "0 0 0 4px rgba(255,107,74,.18)",
-            }}
-          />
-          Your college-readiness check
+      <div className="relative z-10 flex flex-1 flex-col px-[26px] pt-[18px] lg:flex-row lg:items-center lg:gap-16 lg:px-10 lg:pt-20">
+        <div className="lg:flex-1">
+          <div className="mb-5 inline-flex items-center gap-2 text-[12.5px] font-semibold text-[var(--teal-deep)] lg:text-[14px]">
+            <span
+              className="h-[7px] w-[7px] rounded-full"
+              style={{
+                background: "var(--coral)",
+                boxShadow: "0 0 0 4px rgba(255,107,74,.18)",
+              }}
+            />
+            Your college-readiness check
+          </div>
+
+          <h1 className="lead-display mb-4 text-[40px] font-extrabold leading-[1.02] tracking-[-0.025em] lg:text-[64px] lg:leading-[1.04]">
+            Get ready for a{" "}
+            <span className="whitespace-nowrap text-[var(--teal)]">
+              great college.
+            </span>
+          </h1>
+          <p className="max-w-[300px] text-[16.5px] font-medium leading-[1.5] text-[var(--slate)] lg:max-w-[480px] lg:text-[19px]">
+            A quick check that shows where you stand — and how to stand out.
+          </p>
+
+          {/* desktop CTA, inline with hero */}
+          <div className="mt-7 hidden lg:block">
+            <button
+              type="button"
+              onClick={async () => {
+                await ensureRun();
+                router.push("/lead/consent" as Route);
+              }}
+              className="lead-cta inline-flex text-[17px]"
+              style={{ paddingLeft: 28, paddingRight: 28 }}
+            >
+              Start free <span className="text-[19px]">→</span>
+            </button>
+            <div className="mt-5 flex items-center gap-5 text-[13px] font-medium text-[var(--slate)]">
+              <Trust>Free</Trust>
+              <Trust>Private by choice</Trust>
+              <Trust>15 minutes</Trust>
+            </div>
+            <Link
+              href="/login"
+              className="mt-4 inline-block text-[13px] font-medium text-[var(--slate)] no-underline hover:text-[var(--teal-deep)]"
+            >
+              Already have an account? Sign in →
+            </Link>
+          </div>
         </div>
 
-        <h1 className="lead-display mb-4 text-[40px] font-extrabold leading-[1.02] tracking-[-0.025em]">
-          Get ready for a{" "}
-          <span className="whitespace-nowrap text-[var(--teal)]">
-            great college.
-          </span>
-        </h1>
-        <p className="max-w-[300px] text-[16.5px] font-medium leading-[1.5] text-[var(--slate)]">
-          A quick check that shows where you stand — and how to stand out.
-        </p>
-
         {/* zig-zag flow */}
-        <div className="mt-[18px] flex flex-1 flex-col justify-center">
+        <div className="mt-[18px] flex flex-1 flex-col justify-center lg:mt-0 lg:max-w-[460px]">
           <Step n={1} title="Watch" desc="A video" align="left" />
           <Connector dir="right" />
           <Step n={2} title="Present" desc="Share your take" align="right" />
@@ -91,8 +119,8 @@ export default function LeadLandingPage() {
         </div>
       </div>
 
-      {/* footer */}
-      <div className="relative z-10 px-[26px] pb-7 pt-5">
+      {/* phone-frame footer */}
+      <div className="relative z-10 px-[26px] pb-7 pt-5 lg:hidden">
         <button
           type="button"
           onClick={async () => {

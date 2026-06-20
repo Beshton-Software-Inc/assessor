@@ -27,18 +27,19 @@ export default function LeadDonePage() {
       />
 
       <div
-        className="relative z-10 flex-1 overflow-y-auto px-[22px] pb-4 pt-7"
+        className="relative z-10 flex-1 overflow-y-auto px-[22px] pb-4 pt-7 lg:overflow-visible lg:px-10 lg:pb-12 lg:pt-12"
         style={{ scrollbarWidth: "none" }}
       >
-        <h1 className="lead-display mb-1 text-[27px] font-extrabold leading-[1.05] tracking-[-0.02em]">
+        <h1 className="lead-display mb-1 text-[27px] font-extrabold leading-[1.05] tracking-[-0.02em] lg:text-[42px]">
           You&apos;re all set, {firstName} 🎉
         </h1>
-        <p className="mb-3 text-[13.5px] font-medium leading-[1.4] text-[var(--slate)]">
+        <p className="mb-3 text-[13.5px] font-medium leading-[1.4] text-[var(--slate)] lg:mb-8 lg:text-[16px]">
           Here&apos;s how to keep building toward your goal.
         </p>
 
+        <div className="lg:grid lg:grid-cols-[1.1fr_1fr] lg:gap-8">
         <div
-          className="mb-2.5 rounded-[20px] p-4 text-white shadow-[0_20px_40px_-18px_rgba(15,118,110,0.7)]"
+          className="mb-2.5 rounded-[20px] p-4 text-white shadow-[0_20px_40px_-18px_rgba(15,118,110,0.7)] lg:mb-0 lg:p-6"
           style={{
             background: "linear-gradient(140deg,#14B8A6,#0F766E 60%,#0B2B29)",
           }}
@@ -61,6 +62,7 @@ export default function LeadDonePage() {
           </button>
         </div>
 
+        <div className="lg:flex lg:flex-col lg:gap-2.5">
         <Card icon="🎯" title="Your growth plan" subtitle="4 goals to grow">
           <Goal emoji="🧠" text="Stress-test your own arguments" tag="Critical Thinking" />
           <Goal emoji="🗣️" text="Swap fillers for pauses" tag="Communication" />
@@ -108,10 +110,12 @@ export default function LeadDonePage() {
 
         <Link
           href="/student"
-          className="mt-1 block px-2 py-2 text-center text-[13px] font-semibold text-[var(--slate)] no-underline"
+          className="mt-1 block px-2 py-2 text-center text-[13px] font-semibold text-[var(--slate)] no-underline lg:mt-2"
         >
           Back to my dashboard
         </Link>
+        </div>
+        </div>
       </div>
     </PhoneFrame>
   );

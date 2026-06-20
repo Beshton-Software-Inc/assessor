@@ -45,17 +45,19 @@ export default function LeadConsentPage() {
       <ProgressHeader step={1} back="/lead" />
 
       <div
-        className="flex-1 overflow-y-auto px-[26px] pb-2 pt-4"
+        className="flex-1 overflow-y-auto px-[26px] pb-2 pt-4 lg:overflow-visible lg:px-10 lg:pt-10"
         style={{ scrollbarWidth: "none" }}
       >
-        <h1 className="lead-display mb-1 text-[25px] font-extrabold leading-[1.08] tracking-[-0.02em]">
+        <div className="lg:grid lg:grid-cols-[1.1fr_1fr] lg:gap-12">
+        <div>
+        <h1 className="lead-display mb-1 text-[25px] font-extrabold leading-[1.08] tracking-[-0.02em] lg:text-[40px]">
           Before we begin
         </h1>
-        <p className="mb-4 text-[14px] font-medium leading-[1.45] text-[var(--slate)]">
+        <p className="mb-4 text-[14px] font-medium leading-[1.45] text-[var(--slate)] lg:text-[16px]">
           Here&apos;s what happens and how your info is handled.
         </p>
 
-        <div className="mb-4 flex flex-col gap-2.5">
+        <div className="mb-4 flex flex-col gap-2.5 lg:gap-3.5">
           <Row
             icon="🎥"
             title="We record your session"
@@ -77,8 +79,10 @@ export default function LeadConsentPage() {
             desc="Your results are yours. You can decline sharing later."
           />
         </div>
+        </div>
 
-        <div className="mb-3 rounded-2xl border border-[var(--line)] bg-[var(--card)] p-3 shadow-[0_8px_22px_-18px_rgba(13,148,136,0.5)]">
+        <div className="lg:flex lg:flex-col lg:gap-3 lg:pt-1">
+        <div className="mb-3 rounded-2xl border border-[var(--line)] bg-[var(--card)] p-3 shadow-[0_8px_22px_-18px_rgba(13,148,136,0.5)] lg:mb-0 lg:p-4">
           <div className="mb-2 text-[13.5px] font-bold">How old are you?</div>
           <div className="flex gap-2">
             <Toggle on={age === "over_18"} onClick={() => setAge("over_18")}>
@@ -101,7 +105,7 @@ export default function LeadConsentPage() {
         <button
           type="button"
           onClick={() => setAgreed((v) => !v)}
-          className="flex w-full items-start gap-2.5 rounded-[13px] border border-[var(--line)] bg-[var(--card)] p-3 text-left"
+          className="flex w-full items-start gap-2.5 rounded-[13px] border border-[var(--line)] bg-[var(--card)] p-3 text-left lg:p-4"
         >
           <span
             className={`flex h-[21px] w-[21px] flex-none items-center justify-center rounded-md border-2 text-xs font-extrabold transition-colors ${
@@ -112,13 +116,33 @@ export default function LeadConsentPage() {
           >
             ✓
           </span>
-          <span className="text-[12px] leading-[1.4] text-[var(--slate)]">
+          <span className="text-[12px] leading-[1.4] text-[var(--slate)] lg:text-[13px]">
             I agree my session will be recorded to create my results.
           </span>
         </button>
+
+        {/* Desktop: CTA inline at the bottom of the right column */}
+        <div className="mt-4 hidden lg:block">
+          <button
+            type="button"
+            onClick={onContinue}
+            disabled={!canContinue}
+            className="lead-cta w-full text-[16px]"
+          >
+            {submitting ? "Saving…" : "Continue to watch a video →"}
+          </button>
+          <div className="mt-2.5 text-center text-[12px] text-[var(--slate)]">
+            {age === "under_18"
+              ? "A parent/guardian must sign before you start"
+              : "Takes about 15 minutes · You can stop anytime"}
+          </div>
+        </div>
+        </div>
+        </div>
       </div>
 
-      <div className="px-[26px] pb-7 pt-2.5">
+      {/* Phone-frame footer */}
+      <div className="px-[26px] pb-7 pt-2.5 lg:hidden">
         <button
           type="button"
           onClick={onContinue}

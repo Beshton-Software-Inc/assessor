@@ -61,11 +61,11 @@ export default function LeadQaPage() {
         stage={{ num: 3, label: "Q&A" }}
       />
 
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 pt-2">
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 pt-2 lg:px-10 lg:pt-10">
         <QaStage interview={interview} />
 
         {/* small voice indicator */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 lg:mt-2">
           <div
             className={`flex h-[52px] w-[52px] flex-none items-center justify-center rounded-full transition-colors ${
               aiSpeaking ? "" : ""
@@ -129,7 +129,7 @@ export default function LeadQaPage() {
         </div>
       </div>
 
-      <div className="flex items-center justify-center gap-3.5 px-[22px] pb-7">
+      <div className="flex items-center justify-center gap-3.5 px-[22px] pb-7 lg:pb-12 lg:pt-4">
         <button
           type="button"
           aria-label="Captions"

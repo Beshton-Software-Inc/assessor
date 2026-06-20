@@ -19,7 +19,7 @@ export function RecorderStage({ recorder }: Props) {
   }, [stream]);
 
   return (
-    <div className="relative mx-[22px] mt-4 h-[252px] overflow-hidden rounded-[22px]">
+    <div className="relative mx-[22px] mt-4 h-[252px] overflow-hidden rounded-[22px] lg:mx-0 lg:h-full lg:min-h-[420px] lg:rounded-[24px]">
       <video
         ref={videoRef}
         muted
